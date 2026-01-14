@@ -168,20 +168,26 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (account?.provider === "google") {
         // Determine role: only admin@colortouch.app gets ADMIN role, all others are EMPLOYEE
         const role = user.email === process.env.ADMIN_EMAIL ? "ADMIN" : "EMPLOYEE";
-        
-        await prisma.user.upsert({
-          where: { email: user.email },
-          update: {
-            name: user.name ?? "Unknown",
-            role: role, // Update role on each login
-            updatedAt: new Date(),
-          },
-          create: {
-            email: user.email,
-            name: user.name ?? "Unknown",
-            role: role,
-          },
-        });
+
+        try {
+          await prisma.user.upsert({
+            where: { email: user.email },
+            update: {
+              name: user.name ?? "Unknown",
+              role: role, // Update role on each login
+              updatedAt: new Date(),
+            },
+            create: {
+              email: user.email,
+              name: user.name ?? "Unknown",
+              role: role,
+            },
+          });
+        } catch (err: any) {
+          // If the DB is not ready (e.g., tables not created yet), don't hard-fail OAuth.
+          // The app will still need DB to function, but this avoids a confusing AccessDenied.
+          console.error("Database error during Google OAuth upsert:", err?.message || err);
+        }
       }
 
       return true;
