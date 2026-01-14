@@ -1,0 +1,309 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Sync queue for offline changes
+model SyncQueue {
+  id          String   @id @default(cuid())
+  operation   String   // CREATE, UPDATE, DELETE
+  model       String   // Lead, Payment, etc.
+  recordId    String
+  data        String   // JSON stringified data
+  userId      String
+  createdAt   DateTime @default(now())
+  syncedAt    DateTime?
+  error       String?
+  retryCount  Int      @default(0)
+  
+  @@index([userId])
+  @@index([syncedAt])
+}
+
+model Lead {
+  id                String     @id @default(cuid())
+  name              String
+  email             String?    @unique
+  phone             String?
+  company           String?
+  source            String?
+  notes             String?
+  tag               Tag        @default(DISQUALIFIED)
+  duration          Int
+  userId            String
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  status            LeadStatus @default(PENDING)
+  amount            String?
+  bookingDate       DateTime?
+  checkInDates      DateTime?
+  checkoutDate      DateTime?
+  enquiryDate       DateTime?
+  leadsCreatedDate  DateTime?
+  leadsUpdatedDates DateTime?
+  
+  // Sync tracking
+  lastSyncedAt      DateTime?
+  syncStatus        SyncStatus @default(SYNCED)
+  
+  User              User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Reminder          Reminder[]
+
+  // Indexes for performance at scale
+  @@index([userId])
+  @@index([status])
+  @@index([tag])
+  @@index([createdAt])
+  @@index([userId, status])
+  @@index([userId, tag])
+  @@index([syncStatus])
+}
+
+model Payment {
+  id                String        @id @default(cuid())
+  orderId           String        @unique
+  userId            String
+  amount            String
+  currency          String        @default("INR")
+  status            PaymentStatus @default(PENDING)
+  razorpayOrderId   String?       @unique
+  razorpayPaymentId String?       @unique
+  razorpaySignature String?
+  receipt           String?
+  notes             String?
+  paymentMethod     String?
+  paidAt            DateTime?
+  failureReason     String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  
+  // Sync tracking
+  lastSyncedAt      DateTime?
+  syncStatus        SyncStatus    @default(SYNCED)
+  
+  User              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Indexes for performance
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([syncStatus])
+}
+
+model Reminder {
+  id           String       @id @default(cuid())
+  title        String
+  description  String?
+  reminderDate DateTime
+  reminderType ReminderType @default(GENERAL)
+  priority     Priority     @default(MEDIUM)
+  isCompleted  Boolean      @default(false)
+  userId       String
+  leadId       String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  
+  // Sync tracking
+  lastSyncedAt DateTime?
+  syncStatus   SyncStatus   @default(SYNCED)
+  
+  Lead         Lead?        @relation(fields: [leadId], references: [id])
+  User         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([syncStatus])
+}
+
+model User {
+  id                  String                @id @default(cuid())
+  email               String?               @unique
+  name                String
+  role                Role                  @default(ADMIN)
+  password            String?
+  subscription        SubscriptionType      @default(FREE)
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  Lead                Lead[]
+  Payment             Payment[]
+  Reminder            Reminder[]
+  WhatsAppIntegration WhatsAppIntegration[]
+  WhatsappCampaign    WhatsappCampaign[]
+  WhatsappToken       WhatsappToken?
+
+  // Indexes for performance
+  @@index([role])
+  @@index([subscription])
+  @@index([createdAt])
+}
+
+model WhatsAppIntegration {
+  id        String   @id @default(cuid())
+  apiKey    String
+  apiSecret String?
+  provider  Provider
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model WhatsappCampaign {
+  id             String         @id @default(cuid())
+  campaignName   String
+  description    String?
+  campaignType   CampaignType
+  priority       Priority
+  messageType    MessageType
+  messageContent String
+  mediaURL       String?
+  templateID     String?
+  userId         String
+  status         CampaignStatus @default(PAUSED)
+  selectedLeadIds String?       // JSON array of lead IDs
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  User           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model WhatsappToken {
+  id        String   @id @default(cuid())
+  token     String
+  userId    String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum CampaignStatus {
+  ACTIVE
+  PAUSED
+}
+
+enum CampaignType {
+  PROMOTIONAL
+  TRANSACTIONAL
+  MARKETING
+  NOTIFICATION
+  REMINDER
+}
+
+enum LeadStatus {
+  PENDING
+  FOLLOW_UP
+  CONVERTED
+  REJECTED
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  VIDEO
+  AUDIO
+  DOCUMENT
+  TEMPLATE
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum Priority {
+  HIGH
+  MEDIUM
+  LOW
+  URGENT
+}
+
+enum Provider {
+  TWILIO
+  DIALOG360
+  OTHER
+  WHATSAPPBUSINESSAPI
+}
+
+enum ReminderType {
+  CALL
+  EMAIL
+  MEETING
+  FOLLOW_UP
+  GENERAL
+  TASK
+}
+
+enum Role {
+  EMPLOYEE
+  ADMIN
+  USER
+  OTHER
+}
+
+enum Source {
+  SOCIAL
+  REFERRAL
+  EVENT
+  MARKETING
+  OTHER
+}
+
+enum Status {
+  REQUESTED
+  RUNNING
+  COMPLETE
+  CREATED
+  REJECTED
+}
+
+enum SubscriptionType {
+  FREE
+  PREMIUM
+}
+
+enum Tag {
+  HOT
+  WARM
+  COLD
+  QUALIFIED
+  DISQUALIFIED
+}
+
+enum SyncStatus {
+  SYNCED       // Synchronized with server
+  PENDING      // Waiting to sync
+  SYNCING      // Currently syncing
+  CONFLICT     // Conflict detected
+  ERROR        // Sync failed
+}
+
+// WhatsApp Business API Configuration
+model WhatsAppConfig {
+  id              String    @id @default(cuid())
+  phoneNumberId   String    @unique
+  accessToken     String
+  displayName     String?
+  isRegistered    Boolean   @default(false)
+  registeredAt    DateTime?
+  expiresAt       DateTime?  // Certificate expires after 14 days
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@index([phoneNumberId])
+}
+
+// Twilio Configuration
+model TwilioConfig {
+  id              String    @id @default(cuid())
+  accountSid      String    @unique
+  authToken       String
+  phoneNumber     String
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@index([accountSid])
+}

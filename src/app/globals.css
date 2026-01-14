@@ -1,0 +1,142 @@
+@import "tailwindcss";
+
+/* 🌈 Define all your color tokens */
+@layer theme, base, components, utilities;
+
+@layer theme {
+  :root {
+    /* Base Colors - Dark Navy Blue Theme */
+    --color-background: hsl(240 50% 15%);
+    --color-foreground: hsl(0 0% 100%);
+    --color-card: hsl(240 50% 18%);
+    --color-card-foreground: hsl(0 0% 100%);
+    --color-popover: hsl(240 50% 20%);
+    --color-popover-foreground: hsl(0 0% 100%);
+    --color-primary: hsl(0 0% 100%);
+    --color-primary-foreground: hsl(240 50% 15%);
+    --color-secondary: hsl(240 45% 25%);
+    --color-secondary-foreground: hsl(0 0% 100%);
+    --color-muted: hsl(240 40% 30%);
+    --color-muted-foreground: hsl(0 0% 80%);
+    --color-accent: hsl(0 0% 100%);
+    --color-accent-foreground: hsl(240 50% 15%);
+    --color-destructive: hsl(0 65% 50%);
+    --color-destructive-foreground: hsl(0 0% 100%);
+    --color-border: hsl(240 40% 25%);
+    --color-input: hsl(240 45% 22%);
+    --color-ring: hsl(0 0% 100%);
+    --radius: 0.75rem;
+
+    /* Sidebar - Navy Blue */
+    --color-sidebar-background: hsl(240 50% 12%);
+    --color-sidebar-foreground: hsl(0 0% 95%);
+    --color-sidebar-primary: hsl(0 0% 100%);
+    --color-sidebar-primary-foreground: hsl(240 50% 15%);
+    --color-sidebar-accent: hsl(240 45% 22%);
+    --color-sidebar-accent-foreground: hsl(0 0% 100%);
+    --color-sidebar-border: hsl(240 40% 20%);
+    --color-sidebar-ring: hsl(0 0% 100%);
+
+    /* Status Colors */
+    --color-success: hsl(142 76% 45%);
+    --color-warning: hsl(38 92% 50%);
+    --color-info: hsl(199 89% 48%);
+    --color-chart: hsl(187 85% 45%);
+  }
+}
+
+/* 🧱 Base Layer */
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+  }
+}
+
+/* ✅ Optional utility colors (make Tailwind classes like bg-success work) */
+@layer utilities {
+  .bg-success {
+    background-color: var(--color-success);
+  }
+  .text-success {
+    color: var(--color-success);
+  }
+
+  .bg-warning {
+    background-color: var(--color-warning);
+  }
+  .text-warning {
+    color: var(--color-warning);
+  }
+
+  .bg-info {
+    background-color: var(--color-info);
+  }
+  .text-info {
+    color: var(--color-info);
+  }
+
+  .bg-destructive {
+    background-color: var(--color-destructive);
+  }
+  .text-destructive {
+    color: var(--color-destructive);
+  }
+}
+
+/* ✅ Global button cursor styles */
+@layer base {
+  button {
+    cursor: pointer;
+  }
+  
+  button:disabled {
+    cursor: not-allowed;
+  }
+  
+  [role="button"] {
+    cursor: pointer;
+  }
+  
+  .cursor-pointer {
+    cursor: pointer;
+  }
+
+  /* 📅 Professional Date Input Styling */
+  input[type="date"],
+  input[type="time"],
+  input[type="datetime-local"] {
+    cursor: pointer;
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+
+  input[type="date"]::-webkit-calendar-picker-indicator,
+  input[type="time"]::-webkit-calendar-picker-indicator,
+  input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    filter: invert(1) brightness(1.2);
+    margin-right: 4px;
+  }
+
+  /* Firefox date input styling */
+  input[type="date"]::-moz-calendar-picker-indicator {
+    cursor: pointer;
+    filter: invert(1) brightness(1.2);
+  }
+
+  /* Ensure proper contrast for dark mode */
+  input[type="date"]::placeholder {
+    color: #a1a1a1;
+  }
+
+  /* Focus styling for better UX */
+  input[type="date"]:focus {
+    outline: none;
+  }
+}
+

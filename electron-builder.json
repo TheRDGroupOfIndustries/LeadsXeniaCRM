@@ -1,0 +1,48 @@
+{
+  "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
+  "appId": "com.colortouch.crm",
+  "productName": "ColorTouch CRM",
+  "directories": {
+    "output": "ColorTouch-Desktop/installer-output"
+  },
+  "files": [
+    "electron/**/*",
+    "package.json"
+  ],
+  "extraResources": [
+    {
+      "from": "ColorTouch-Desktop/server",
+      "to": "server",
+      "filter": ["**/*"]
+    },
+    {
+      "from": "ColorTouch-Desktop/resources",
+      "to": "resources",
+      "filter": ["**/*"]
+    },
+    {
+      "from": "build/icons/icons/win/icon.ico",
+      "to": "icon.ico"
+    }
+  ],
+  "win": {
+    "target": [
+      {
+        "target": "nsis",
+        "arch": ["x64", "ia32"]
+      }
+    ],
+    "icon": "build/icons/icons/win/icon.ico",
+    "artifactName": "${productName}-Setup-${version}.${ext}",
+    "signAndEditExecutable": false
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "ColorTouch CRM",
+    "installerIcon": "build/icons/icons/win/icon.ico",
+    "uninstallerIcon": "build/icons/icons/win/icon.ico"
+  }
+}
