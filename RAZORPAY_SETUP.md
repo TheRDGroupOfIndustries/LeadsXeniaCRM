@@ -1,7 +1,7 @@
 # Razorpay Payment Integration Setup Guide
 
 ## Overview
-Your ColorTouch CRM now has a complete Razorpay payment gateway integration. This guide will help you configure and test the payment system.
+Your XeniaCRM CRM now has a complete Razorpay payment gateway integration. This guide will help you configure and test the payment system.
 
 ## Features Implemented
 
@@ -47,7 +47,7 @@ Your ColorTouch CRM now has a complete Razorpay payment gateway integration. Thi
 
 ### Step 1: Database Migration
 ```bash
-cd ColorTouch
+cd XeniaCRM
 npx prisma db push
 ```
 

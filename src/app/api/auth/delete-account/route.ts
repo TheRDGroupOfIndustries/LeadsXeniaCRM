@@ -48,9 +48,7 @@ export async function DELETE() {
           prisma.reminder.deleteMany({ where: { userId } }),
           prisma.lead.deleteMany({ where: { userId } }),
           prisma.payment.deleteMany({ where: { userId } }),
-          prisma.whatsAppIntegration.deleteMany({ where: { userId } }),
-          prisma.whatsappCampaign.deleteMany({ where: { userId } }),
-          prisma.whatsappToken.deleteMany({ where: { userId } }),
+          prisma.campaign.deleteMany({ where: { userId } }),
           prisma.user.delete({ where: { id: userId } })
         ]);
 

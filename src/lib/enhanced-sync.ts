@@ -10,7 +10,7 @@ import prisma from './prisma';
 export interface SyncQueueItem {
   id?: string;
   operation: 'CREATE' | 'UPDATE' | 'DELETE';
-  model: 'Lead' | 'Payment' | 'Reminder' | 'WhatsappCampaign';
+  model: 'Lead' | 'Payment' | 'Reminder' | 'Campaign';
   recordId: string;
   data: any;
   userId: string;

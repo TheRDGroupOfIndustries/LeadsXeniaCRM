@@ -48,8 +48,8 @@ yarn-error.log*
 
 # Prisma
 /src/generated/prisma
-/prisma/colortouch.db
-/prisma/colortouch.db-journal
+/prisma/xeniacrm.db
+/prisma/xeniacrm.db-journal
 
 # Electron build outputs
 /build-offline

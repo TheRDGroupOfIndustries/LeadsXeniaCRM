@@ -1,5 +1,5 @@
 /**
- * ColorTouch CRM - Desktop App Builder
+ * XeniaCRM CRM - Desktop App Builder
  * Creates a complete offline desktop application
  * Supports: Windows x86, x64 (Windows 7, 8, 10, 11)
  */
@@ -11,14 +11,14 @@ const https = require('https');
 const http = require('http');
 
 const ROOT = path.resolve(__dirname, '..');
-const OUTPUT = path.join(ROOT, 'ColorTouch-Desktop');
+const OUTPUT = path.join(ROOT, 'XeniaCRM-Desktop');
 const TEMP = path.join(ROOT, '.build-temp');
 
 const CONFIG = {
     // Node 18 LTS has better compatibility with older Windows
     nodeVersionX64: '18.19.0',
     nodeVersionX86: '18.19.0',
-    appName: 'ColorTouch CRM',
+    appName: 'XeniaCRM CRM',
     appVersion: '1.0.0'
 };
 
@@ -62,7 +62,7 @@ function download(url, dest) {
 
 // Create VBS launcher that doesn't show console window
 function createVBSLauncher(outputPath) {
-    const vbsContent = `' ColorTouch CRM Launcher
+    const vbsContent = `' XeniaCRM CRM Launcher
 ' Runs the app without showing console window
 Set WshShell = CreateObject("WScript.Shell")
 currentDir = CreateObject("Scripting.FileSystemObject").GetParentFolderName(WScript.ScriptFullName)
@@ -94,7 +94,7 @@ End If
 ' Open in default browser
 WshShell.Run "http://localhost:3000"
 `;
-    fs.writeFileSync(path.join(outputPath, 'ColorTouch CRM.vbs'), vbsContent);
+    fs.writeFileSync(path.join(outputPath, 'XeniaCRM CRM.vbs'), vbsContent);
 }
 
 // Create server start script
@@ -136,7 +136,7 @@ if exist "..\\node\\x64\\node.exe" (
 
 async function build() {
     console.log('\n========================================');
-    console.log('  ColorTouch CRM - Desktop App Builder');
+    console.log('  XeniaCRM CRM - Desktop App Builder');
     console.log('  Multi-Architecture (x86 + x64)');
     console.log('========================================\n');
     
@@ -193,10 +193,10 @@ async function build() {
     log('Creating desktop configuration...');
     const envContent = `NODE_ENV=production
 PORT=3000
-DATABASE_URL=file:./prisma/colortouch.db
+DATABASE_URL=file:./prisma/xeniacrm.db
 NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=colortouch-offline-desktop-${Date.now()}
-ADMIN_EMAIL=admin@colortouch.app
+NEXTAUTH_SECRET=xeniacrm-offline-desktop-${Date.now()}
+ADMIN_EMAIL=admin@xeniacrm.app
 DESKTOP_MODE=true
 `;
     fs.writeFileSync(path.join(OUTPUT, 'server', 'app', '.env'), envContent);
@@ -257,12 +257,12 @@ DESKTOP_MODE=true
     
     // Step 8: Create main launcher BAT (user-visible)
     const launcherBat = `@echo off
-title ColorTouch CRM
+title XeniaCRM CRM
 cd /d "%~dp0"
 
 echo.
 echo  ====================================
-echo    ColorTouch CRM - Starting...
+echo    XeniaCRM CRM - Starting...
 echo  ====================================
 echo.
 
@@ -299,7 +299,7 @@ if exist "server\\node\\%ARCH%\\node.exe" (
 echo Starting server with %NODE_PATH%...
 
 :: Start server in background
-start /min "ColorTouch Server" cmd /c "cd /d "%~dp0server\\app" && "..\\..\\%NODE_PATH%" server.js"
+start /min "XeniaCRM Server" cmd /c "cd /d "%~dp0server\\app" && "..\\..\\%NODE_PATH%" server.js"
 
 :: Wait for server
 echo Waiting for server to start...
@@ -313,7 +313,7 @@ if %errorlevel% neq 0 goto wait
 
 echo Server ready!
 echo.
-echo Opening ColorTouch CRM in your browser...
+echo Opening XeniaCRM CRM in your browser...
 start "" "http://localhost:3000"
 exit /b 0
 
@@ -323,11 +323,11 @@ echo Check server\\app folder for errors.
 pause
 exit /b 1
 `;
-    fs.writeFileSync(path.join(OUTPUT, 'Start ColorTouch CRM.bat'), launcherBat);
+    fs.writeFileSync(path.join(OUTPUT, 'Start XeniaCRM CRM.bat'), launcherBat);
     
     // Stop server BAT
     const stopBat = `@echo off
-echo Stopping ColorTouch CRM...
+echo Stopping XeniaCRM CRM...
 for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":3000" ^| findstr "LISTENING"') do taskkill /F /PID %%a >nul 2>&1
 echo Done!
 timeout /t 2 >nul
@@ -337,16 +337,16 @@ timeout /t 2 >nul
     // README
     const readme = `
 =====================================
-    ColorTouch CRM - Desktop App
+    XeniaCRM CRM - Desktop App
     Version ${CONFIG.appVersion}
 =====================================
 
 QUICK START:
-  Double-click "ColorTouch CRM.vbs" (recommended)
-  OR double-click "Start ColorTouch CRM.bat"
+  Double-click "XeniaCRM CRM.vbs" (recommended)
+  OR double-click "Start XeniaCRM CRM.bat"
 
 DEFAULT LOGIN:
-  Email: admin@colortouch.app
+  Email: admin@xeniacrm.app
   Password: Admin@123!
 
 COMPATIBILITY:
@@ -355,19 +355,19 @@ COMPATIBILITY:
   - No internet required (offline mode)
 
 FILES:
-  - ColorTouch CRM.vbs        = Silent launcher (no console window)
-  - Start ColorTouch CRM.bat  = Launcher with console (for debugging)
+  - XeniaCRM CRM.vbs        = Silent launcher (no console window)
+  - Start XeniaCRM CRM.bat  = Launcher with console (for debugging)
   - Stop Server.bat           = Stop the server
   - server/                   = Backend server files
   - resources/                = App resources
 
 SYNC:
   When internet is available, your data will automatically
-  sync with the online version of ColorTouch CRM.
+  sync with the online version of XeniaCRM CRM.
 
 TROUBLESHOOTING:
   1. If app doesn't start, run "Stop Server.bat" first
-  2. Then try "Start ColorTouch CRM.bat" again
+  2. Then try "Start XeniaCRM CRM.bat" again
   3. Check if port 3000 is blocked by firewall
 
 URL: http://localhost:3000
@@ -376,14 +376,14 @@ URL: http://localhost:3000
 
     // Step 9: Update Installer Script
     log('Updating installer script...');
-    const installerScript = `; ColorTouch CRM Installer Script
+    const installerScript = `; XeniaCRM CRM Installer Script
 ; Inno Setup 6.x - Multi-Architecture Support
 ; Supports: Windows 7, 8, 10, 11 (x86 and x64)
 
-#define MyAppName "ColorTouch CRM"
+#define MyAppName "XeniaCRM CRM"
 #define MyAppVersion "${CONFIG.appVersion}"
-#define MyAppPublisher "ColorTouch"
-#define MyAppExeName "ColorTouch CRM.vbs"
+#define MyAppPublisher "XeniaCRM"
+#define MyAppExeName "XeniaCRM CRM.vbs"
 
 [Setup]
 AppId={{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}
@@ -394,7 +394,7 @@ DefaultDirName={autopf}\\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 OutputDir=installer-output
-OutputBaseFilename=ColorTouch-CRM-Setup
+OutputBaseFilename=XeniaCRM-CRM-Setup
 SetupIconFile=icon.ico
 UninstallDisplayIcon={app}\\resources\\icons\\icon.ico
 Compression=lzma2/ultra64
@@ -412,8 +412,8 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
 ; Main launcher files
-Source: "ColorTouch CRM.vbs"; DestDir: "{app}"; Flags: ignoreversion
-Source: "Start ColorTouch CRM.bat"; DestDir: "{app}"; Flags: ignoreversion
+Source: "XeniaCRM CRM.vbs"; DestDir: "{app}"; Flags: ignoreversion
+Source: "Start XeniaCRM CRM.bat"; DestDir: "{app}"; Flags: ignoreversion
 Source: "Stop Server.bat"; DestDir: "{app}"; Flags: ignoreversion
 Source: "README.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "icon.ico"; DestDir: "{app}"; Flags: ignoreversion
@@ -451,7 +451,7 @@ begin
   end;
 end;
 `;
-    fs.writeFileSync(path.join(OUTPUT, 'ColorTouch-Installer.iss'), installerScript);
+    fs.writeFileSync(path.join(OUTPUT, 'XeniaCRM-Installer.iss'), installerScript);
     
     // Step 10: Cleanup
     log('Cleaning up temporary files...');
@@ -467,9 +467,9 @@ end;
     console.log('  - Both 32-bit (x86) and 64-bit (x64)');
     console.log('\nTo create installer:');
     console.log('  1. Install Inno Setup from https://jrsoftware.org/isinfo.php');
-    console.log('  2. Open ColorTouch-Desktop/ColorTouch-Installer.iss');
+    console.log('  2. Open XeniaCRM-Desktop/XeniaCRM-Installer.iss');
     console.log('  3. Click Build > Compile');
-    console.log('  4. Find installer in ColorTouch-Desktop/installer-output/');
+    console.log('  4. Find installer in XeniaCRM-Desktop/installer-output/');
     console.log('');
 }
 

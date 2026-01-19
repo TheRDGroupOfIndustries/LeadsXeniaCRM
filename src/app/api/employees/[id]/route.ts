@@ -270,7 +270,7 @@ export async function GET(
           _count: {
             select: {
               Lead: true,
-              WhatsappCampaign: true
+              Campaign: true
             }
           }
         }

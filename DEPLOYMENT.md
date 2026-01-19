@@ -1,4 +1,4 @@
-# ColorTouch Deployment Guide
+# XeniaCRM Deployment Guide
 
 This app is configured to use Neon (PostgreSQL) in the cloud.
 
@@ -28,7 +28,7 @@ Optional for seeding:
 4. Seed an admin user (optional):
 
    ```powershell
-   # Defaults: admin@colortouch.app / Admin@123!
+   # Defaults: admin@xeniacrm.app / Admin@123!
    # Or override via env vars
    setx ADMIN_EMAIL "admin@yourdomain.com"
    setx ADMIN_PASSWORD "StrongPass@123"

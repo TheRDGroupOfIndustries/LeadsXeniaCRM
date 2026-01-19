@@ -11,18 +11,14 @@ async function exportData() {
     // Export all data
     const users = await prisma.user.findMany();
     const leads = await prisma.lead.findMany();
-    const campaigns = await prisma.whatsappCampaign.findMany();
-    const tokens = await prisma.whatsappToken.findMany();
     const reminders = await prisma.reminder.findMany();
-    const integrations = await prisma.whatsAppIntegration.findMany();
+    const campaigns = await prisma.campaign.findMany();
 
     const exportData = {
       users,
       leads,
       campaigns,
-      tokens,
       reminders,
-      integrations,
       exportedAt: new Date().toISOString()
     };
 
@@ -33,7 +29,7 @@ async function exportData() {
     }
 
     // Save as JSON
-    const exportPath = path.join(exportDir, `colortouch-export-${Date.now()}.json`);
+    const exportPath = path.join(exportDir, `xeniacrm-export-${Date.now()}.json`);
     fs.writeFileSync(exportPath, JSON.stringify(exportData, null, 2));
 
     console.log('✅ Data exported successfully!');
@@ -42,9 +38,7 @@ async function exportData() {
     console.log(`- Users: ${users.length}`);
     console.log(`- Leads: ${leads.length}`);
     console.log(`- Campaigns: ${campaigns.length}`);
-    console.log(`- Tokens: ${tokens.length}`);
     console.log(`- Reminders: ${reminders.length}`);
-    console.log(`- Integrations: ${integrations.length}`);
 
   } catch (error) {
     console.error('❌ Export failed:', error);

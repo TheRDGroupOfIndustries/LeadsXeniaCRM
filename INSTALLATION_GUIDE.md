@@ -1,4 +1,4 @@
-# ColorTouch CRM - Desktop App Installation Guide
+# XeniaCRM CRM - Desktop App Installation Guide
 
 ## 📦 What Was Built
 
@@ -8,7 +8,7 @@
 ✅ **Network Detection** - Real-time online/offline indicator
 ✅ **Persistent Storage** - Data saved locally even when offline
 ✅ **Queue Management** - Changes queue for sync when back online
-✅ **Custom Icon** - ColorTouch logo branding
+✅ **Custom Icon** - XeniaCRM logo branding
 
 ---
 
@@ -18,20 +18,20 @@
 
 **Installer Location:**
 ```
-C:\Users\Public\colour-touch-cmr\ColorTouch\dist\ColorTouch CRM-Setup-0.1.0.exe
+C:\Users\Public\colour-touch-cmr\XeniaCRM\dist\XeniaCRM CRM-Setup-0.1.0.exe
 ```
 
 **Steps:**
 1. Open File Explorer
-2. Navigate to: `C:\Users\Public\colour-touch-cmr\ColorTouch\dist\`
-3. Find: `ColorTouch CRM-Setup-0.1.0.exe` (approx 120-150 MB)
+2. Navigate to: `C:\Users\Public\colour-touch-cmr\XeniaCRM\dist\`
+3. Find: `XeniaCRM CRM-Setup-0.1.0.exe` (approx 120-150 MB)
 4. Double-click to run installer
 5. If Windows Defender warns "Windows protected your PC":
    - Click "More info"
    - Click "Run anyway"
 6. Follow installation wizard:
    - Accept license agreement
-   - Choose install location (default: `C:\Program Files\ColorTouch CRM\`)
+   - Choose install location (default: `C:\Program Files\XeniaCRM CRM\`)
    - Select "Create a desktop icon" ✅
    - Select "Create a Start Menu shortcut" ✅
 7. Click "Install"
@@ -49,7 +49,7 @@ C:\Users\Public\colour-touch-cmr\ColorTouch\dist\ColorTouch CRM-Setup-0.1.0.exe
 **Upload to Cloud Storage:**
 
 1. **Google Drive:**
-   - Upload `ColorTouch CRM-Setup-0.1.0.exe`
+   - Upload `XeniaCRM CRM-Setup-0.1.0.exe`
    - Right-click → Share → Get link
    - Share link with team members
 
@@ -65,13 +65,13 @@ C:\Users\Public\colour-touch-cmr\ColorTouch\dist\ColorTouch CRM-Setup-0.1.0.exe
 4. **GitHub Release (for developers):**
    ```powershell
    # Create release and upload installer
-   gh release create v0.1.0 dist\ColorTouch*.exe --title "ColorTouch CRM v0.1.0"
+   gh release create v0.1.0 dist\XeniaCRM*.exe --title "XeniaCRM CRM v0.1.0"
    ```
 
 **Copy to USB Drive:**
 ```powershell
 # Copy to USB (replace F: with your USB drive letter)
-Copy-Item "dist\ColorTouch CRM-Setup-0.1.0.exe" "F:\"
+Copy-Item "dist\XeniaCRM CRM-Setup-0.1.0.exe" "F:\"
 ```
 
 ---
@@ -89,7 +89,7 @@ Copy-Item "dist\ColorTouch CRM-Setup-0.1.0.exe" "F:\"
 
 ### Requires Internet:
 - ❌ Upload CSV files (queued for sync)
-- ❌ Send WhatsApp campaigns
+- ❌ Send campaigns
 - ❌ Process Razorpay payments
 - ❌ Send email notifications
 - ❌ Google OAuth login
@@ -108,18 +108,18 @@ Copy-Item "dist\ColorTouch CRM-Setup-0.1.0.exe" "F:\"
 
 **Desktop Shortcut:**
 ```
-%USERPROFILE%\Desktop\ColorTouch CRM.lnk
+%USERPROFILE%\Desktop\XeniaCRM CRM.lnk
 ```
 
 **Start Menu:**
 ```
-%APPDATA%\Microsoft\Windows\Start Menu\Programs\ColorTouch CRM\
+%APPDATA%\Microsoft\Windows\Start Menu\Programs\XeniaCRM CRM\
 ```
 
 **Installation Folder:**
 ```
-C:\Program Files\ColorTouch CRM\
-├── ColorTouch CRM.exe (main app)
+C:\Program Files\XeniaCRM CRM\
+├── XeniaCRM CRM.exe (main app)
 ├── resources\
 │   └── app.asar (bundled app code)
 ├── locales\
@@ -128,8 +128,8 @@ C:\Program Files\ColorTouch CRM\
 
 **User Data:**
 ```
-%APPDATA%\ColorTouch CRM\
-├── colortouch.db (SQLite database)
+%APPDATA%\XeniaCRM CRM\
+├── xeniacrm.db (SQLite database)
 ├── logs\
 └── cache\
 ```
@@ -140,12 +140,12 @@ C:\Program Files\ColorTouch CRM\
 
 ### Portable Version (No Installation Required)
 
-Located at: `dist\win-unpacked\ColorTouch CRM.exe`
+Located at: `dist\win-unpacked\XeniaCRM CRM.exe`
 
 **Use Case:** Run from USB without installing
 **Steps:**
 1. Copy entire `win-unpacked` folder to USB
-2. Run `ColorTouch CRM.exe` directly
+2. Run `XeniaCRM CRM.exe` directly
 3. No admin rights needed
 4. Data stored in same folder
 
@@ -176,8 +176,8 @@ To update to a newer version:
 ### App Won't Start
 **Symptoms:** White screen, crash on launch  
 **Solutions:**
-1. Check logs: `%APPDATA%\ColorTouch CRM\logs\main.log`
-2. Delete cache: `%APPDATA%\ColorTouch CRM\cache\`
+1. Check logs: `%APPDATA%\XeniaCRM CRM\logs\main.log`
+2. Delete cache: `%APPDATA%\XeniaCRM CRM\cache\`
 3. Reinstall app
 4. Check antivirus hasn't blocked app
 
@@ -186,8 +186,8 @@ To update to a newer version:
 **Solution:**
 ```powershell
 # Locate database
-cd "%APPDATA%\ColorTouch CRM"
-dir colortouch.db
+cd "%APPDATA%\XeniaCRM CRM"
+dir xeniacrm.db
 
 # If missing, run migrations
 npx prisma migrate deploy
@@ -206,8 +206,8 @@ npx prisma migrate deploy
 **Solution:**
 ```powershell
 # Reset admin password in database
-cd "%APPDATA%\ColorTouch CRM"
-# Open colortouch.db with SQLite browser
+cd "%APPDATA%\XeniaCRM CRM"
+# Open xeniacrm.db with SQLite browser
 # Or run seed script again
 ```
 
@@ -252,7 +252,7 @@ cd "%APPDATA%\ColorTouch CRM"
 3. **Add Data:** Create test leads
 4. **Test Sync:** Reconnect internet, watch sync indicator
 5. **Share App:** Send installer to team members
-6. **Configure:** Set up WhatsApp, email integrations (requires internet)
+6. **Configure:** Set up email and integrations (requires internet)
 
 ---
 
@@ -261,13 +261,13 @@ cd "%APPDATA%\ColorTouch CRM"
 **Check Logs:**
 ```powershell
 # Open log folder
-explorer "%APPDATA%\ColorTouch CRM\logs"
+explorer "%APPDATA%\XeniaCRM CRM\logs"
 ```
 
 **Reset App:**
 ```powershell
 # Clear all data (keeps installation)
-Remove-Item -Recurse "%APPDATA%\ColorTouch CRM\*"
+Remove-Item -Recurse "%APPDATA%\XeniaCRM CRM\*"
 # Restart app
 ```
 
@@ -277,11 +277,11 @@ Remove-Item -Recurse "%APPDATA%\ColorTouch CRM\*"
 start ms-settings:appsfeatures
 
 # Or command line
-wmic product where name="ColorTouch CRM" call uninstall
+wmic product where name="XeniaCRM CRM" call uninstall
 ```
 
 ---
 
 **Your offline desktop app is ready! 🎉**
 
-Run the installer at: `C:\Users\Public\colour-touch-cmr\ColorTouch\dist\ColorTouch CRM-Setup-0.1.0.exe`
+Run the installer at: `C:\Users\Public\colour-touch-cmr\XeniaCRM\dist\XeniaCRM CRM-Setup-0.1.0.exe`

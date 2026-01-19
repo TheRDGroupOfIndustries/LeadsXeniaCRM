@@ -1,4 +1,4 @@
-# Quick Reference - ColorTouch CRM Configurations
+# Quick Reference - XeniaCRM CRM Configurations
 
 ## 🌐 Web Deployment (PostgreSQL - Online)
 
@@ -29,7 +29,7 @@ npm start
 Use this for desktop installer:
 
 ```env
-DATABASE_URL="file:./colortouch.db"
+DATABASE_URL="file:./xeniacrm.db"
 OFFLINE_MODE=true
 AUTO_SYNC_ENABLED=true
 ```
@@ -121,13 +121,13 @@ npm start
 
 **Build in progress:**
 - ✅ SQLite schema configured
-- ✅ Database created: `colortouch.db`
+- ✅ Database created: `xeniacrm.db`
 - ✅ Admin user seeded
 - ⏳ Building Windows installer...
 
 **Installer will be at:**
 ```
-dist\ColorTouch CRM-Setup-0.1.0.exe
+dist\XeniaCRM CRM-Setup-0.1.0.exe
 ```
 
 **After build completes, restore web config:**
@@ -168,7 +168,7 @@ Get-Content .env | Select-String "DATABASE_URL"
 Get-Content prisma\schema.prisma | Select-String "provider"
 
 # View current database
-Get-Item colortouch.db  # SQLite
+Get-Item xeniacrm.db  # SQLite
 # Or check PostgreSQL connection
 npx prisma studio
 ```

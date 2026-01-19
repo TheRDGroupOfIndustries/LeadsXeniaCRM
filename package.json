@@ -1,8 +1,8 @@
 {
-  "name": "colortouch-crm",
+  "name": "xeniacrm-crm",
   "version": "1.0.0",
-  "description": "ColorTouch CRM - Customer Relationship Management",
-  "author": "ColorTouch",
+  "description": "XeniaCRM CRM - Customer Relationship Management",
+  "author": "XeniaCRM",
   "private": true,
   "main": "electron/main.js",
   "scripts": {
@@ -19,8 +19,7 @@
     "clean": "rimraf .next && npx prisma generate",
     "build:desktop": "node scripts/build-desktop.js",
     "build:electron": "node scripts/build-electron.js",
-    "electron:dev": "electron .",
-    "whatsapp:validate": "node scripts/whatsapp-validate-meta.js"
+    "electron:dev": "electron ."
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

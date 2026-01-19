@@ -49,10 +49,6 @@ export default function SupportPage() {
       answer: "Go to Lead Management, click 'Upload CSV', and select your file following the template format."
     },
     {
-      question: "Can I integrate WhatsApp Business API?",
-      answer: "Yes! Go to WhatsApp Campaigns to configure your WhatsApp Business API credentials."
-    },
-    {
       question: "How do I add team members?",
       answer: "Admins can add employees from the Employees page using the 'Add Employee' button."
     }
@@ -76,16 +72,16 @@ export default function SupportPage() {
           <Mail className="w-8 h-8 text-primary mx-auto mb-3" />
           <h3 className="font-semibold text-foreground mb-1">Email Support</h3>
           <p className="text-sm text-muted-foreground mb-3">Get help via email</p>
-          <a href="mailto:support@colortouch.app" className="text-primary text-sm hover:underline">
-            support@colortouch.app
+          <a href="mailto:support@xeniacrm.app" className="text-primary text-sm hover:underline">
+            support@xeniacrm.app
           </a>
         </Card>
 
         <Card className="bg-card border-border p-6 text-center">
-          <MessageCircle className="w-8 h-8 text-green-500 mx-auto mb-3" />
-          <h3 className="font-semibold text-foreground mb-1">WhatsApp</h3>
-          <p className="text-sm text-muted-foreground mb-3">Chat with us</p>
-          <a href="https://wa.me/1234567890" target="_blank" rel="noopener" className="text-green-500 text-sm hover:underline">
+          <Phone className="w-8 h-8 text-primary mx-auto mb-3" />
+          <h3 className="font-semibold text-foreground mb-1">Phone</h3>
+          <p className="text-sm text-muted-foreground mb-3">Call us for help</p>
+          <a href="tel:+1234567890" className="text-primary text-sm hover:underline">
             +1 234 567 890
           </a>
         </Card>

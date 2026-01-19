@@ -130,9 +130,7 @@ model User {
   Lead                Lead[]
   Payment             Payment[]
   Reminder            Reminder[]
-  WhatsAppIntegration WhatsAppIntegration[]
-  WhatsappCampaign    WhatsappCampaign[]
-  WhatsappToken       WhatsappToken?
+  Campaign            Campaign[]
 
   // Indexes for performance
   @@index([role])
@@ -140,18 +138,7 @@ model User {
   @@index([createdAt])
 }
 
-model WhatsAppIntegration {
-  id        String   @id @default(cuid())
-  apiKey    String
-  apiSecret String?
-  provider  Provider
-  userId    String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model WhatsappCampaign {
+model Campaign {
   id             String         @id @default(cuid())
   campaignName   String
   description    String?
@@ -167,15 +154,6 @@ model WhatsappCampaign {
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
   User           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model WhatsappToken {
-  id        String   @id @default(cuid())
-  token     String
-  userId    String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum CampaignStatus {
@@ -221,12 +199,6 @@ enum Priority {
   URGENT
 }
 
-enum Provider {
-  TWILIO
-  DIALOG360
-  OTHER
-  WHATSAPPBUSINESSAPI
-}
 
 enum ReminderType {
   CALL
@@ -281,30 +253,3 @@ enum SyncStatus {
   ERROR        // Sync failed
 }
 
-// WhatsApp Business API Configuration
-model WhatsAppConfig {
-  id              String    @id @default(cuid())
-  phoneNumberId   String    @unique
-  accessToken     String
-  displayName     String?
-  isRegistered    Boolean   @default(false)
-  registeredAt    DateTime?
-  expiresAt       DateTime?  // Certificate expires after 14 days
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  
-  @@index([phoneNumberId])
-}
-
-// Twilio Configuration
-model TwilioConfig {
-  id              String    @id @default(cuid())
-  accountSid      String    @unique
-  authToken       String
-  phoneNumber     String
-  isActive        Boolean   @default(true)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  
-  @@index([accountSid])
-}

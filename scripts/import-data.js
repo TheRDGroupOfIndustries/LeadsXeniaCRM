@@ -9,7 +9,7 @@ async function importData() {
     // Find the latest export file
     const exportDir = path.join(__dirname, '../data-export');
     const files = fs.readdirSync(exportDir)
-      .filter(file => file.startsWith('colortouch-export-') && file.endsWith('.json'))
+      .filter(file => file.startsWith('xeniacrm-export-') && file.endsWith('.json'))
       .sort()
       .reverse();
     
@@ -48,25 +48,15 @@ async function importData() {
 
     // 3. Import Campaigns
     console.log('📢 Importing campaigns...');
-    for (const campaign of exportData.campaigns) {
-      await prisma.whatsappCampaign.upsert({
+    for (const campaign of (exportData.campaigns || [])) {
+      await prisma.campaign.upsert({
         where: { id: campaign.id },
         update: campaign,
         create: campaign
       });
     }
 
-    // 4. Import Tokens
-    console.log('🔑 Importing tokens...');
-    for (const token of exportData.tokens) {
-      await prisma.whatsappToken.upsert({
-        where: { id: token.id },
-        update: token,
-        create: token
-      });
-    }
-
-    // 5. Import Reminders
+    // 4. Import Reminders
     console.log('⏰ Importing reminders...');
     for (const reminder of exportData.reminders) {
       await prisma.reminder.upsert({
@@ -76,24 +66,12 @@ async function importData() {
       });
     }
 
-    // 6. Import Integrations
-    console.log('🔗 Importing integrations...');
-    for (const integration of exportData.integrations) {
-      await prisma.whatsAppIntegration.upsert({
-        where: { id: integration.id },
-        update: integration,
-        create: integration
-      });
-    }
-
     console.log('✅ Data imported successfully!');
     console.log('\n📊 Import Summary:');
     console.log(`- Users: ${exportData.users.length}`);
     console.log(`- Leads: ${exportData.leads.length}`);
-    console.log(`- Campaigns: ${exportData.campaigns.length}`);
-    console.log(`- Tokens: ${exportData.tokens.length}`);
     console.log(`- Reminders: ${exportData.reminders.length}`);
-    console.log(`- Integrations: ${exportData.integrations.length}`);
+    console.log(`- Campaigns: ${(exportData.campaigns || []).length}`);
 
   } catch (error) {
     console.error('❌ Import failed:', error);

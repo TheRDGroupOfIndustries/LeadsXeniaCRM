@@ -22,7 +22,6 @@ interface Lead {
   notes?: string;
   Role?: string;
   active?: boolean;
-  whatsapp?: boolean;
 }
 
 // Data required for adding a lead (excluding auto-generated fields)
@@ -47,7 +46,6 @@ const INITIAL_FORM_STATE: Partial<Lead> = {
   company: "",
   Role: "",
   active: true, // Default to active for new leads
-  whatsapp: false,
 };
 
 export default function LeadsModal({
@@ -72,7 +70,6 @@ export default function LeadsModal({
         company: lead.company,
         Role: lead.Role || "",
         active: lead.active ?? false,
-        whatsapp: lead.whatsapp ?? false,
       });
     } else if (popup === "add") {
       // Reset to initial state for adding a new lead
@@ -283,7 +280,7 @@ export default function LeadsModal({
                     <b>Company:</b> {lead.company}
                   </p>
                   <p>
-                    <b>WhatsApp:</b> {lead.whatsapp ? "Enabled" : "Disabled"}
+                    <b>Alerts:</b> Enabled
                   </p>
                 </div>
               </div>
@@ -325,17 +322,6 @@ export default function LeadsModal({
                 />
               </div>
 
-              {/* WhatsApp Toggle */}
-              <div className="flex items-center justify-between bg-gray-800 p-4 rounded-lg border border-gray-700">
-                <div>
-                  <h2 className="font-semibold text-sm">WhatsApp Alerts</h2>
-                  <p className="text-xs text-gray-400">Send WhatsApp updates</p>
-                </div>
-                <Toggelbtn
-                  checked={form.whatsapp ?? false}
-                  onCheckedChange={(v) => handleSwitch("whatsapp", v)}
-                />
-              </div>
             </>
           )}
 

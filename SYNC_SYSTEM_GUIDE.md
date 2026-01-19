@@ -1,8 +1,8 @@
-# ColorTouch CRM - Online/Offline Sync System
+# XeniaCRM CRM - Online/Offline Sync System
 
 ## Overview
 
-ColorTouch CRM now features a comprehensive **online/offline sync system** that allows you to work seamlessly whether you have an internet connection or not. All your changes are tracked and automatically synchronized when you're back online.
+XeniaCRM CRM now features a comprehensive **online/offline sync system** that allows you to work seamlessly whether you have an internet connection or not. All your changes are tracked and automatically synchronized when you're back online.
 
 ## Key Features
 
@@ -31,7 +31,7 @@ ColorTouch CRM now features a comprehensive **online/offline sync system** that 
 ### Database Architecture
 
 **Offline (Local):**
-- SQLite database (`colortouch.db`)
+- SQLite database (`xeniacrm.db`)
 - Stores all your data locally
 - Works without internet connection
 
@@ -191,7 +191,7 @@ const count = await getQueueCount();
 DATABASE_URL="postgresql://user:pass@host:5432/dbname"
 
 # Or keep SQLite for offline-only
-DATABASE_URL="file:./colortouch.db"
+DATABASE_URL="file:./xeniacrm.db"
 ```
 
 ### Sync Intervals
@@ -218,7 +218,7 @@ const syncInterval = setInterval(() => {
 - Review conflicts when they occur
 
 ### 3. **Offline Limitations**
-- WhatsApp messaging requires internet
+- Messaging requires internet
 - File uploads may fail offline
 - Some API features need connection
 

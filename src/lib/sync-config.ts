@@ -6,7 +6,7 @@
  */
 
 // In desktop mode, this should be set to your deployed webapp URL
-// e.g., "https://colortouch-crm.vercel.app" or your custom domain
+// e.g., "https://xeniacrm-crm.vercel.app" or your custom domain
 export const SYNC_CONFIG = {
   // Remote API URL - set this to your deployed webapp's URL
   // Leave empty to use local API only (no remote sync)

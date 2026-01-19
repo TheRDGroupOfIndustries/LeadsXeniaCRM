@@ -133,7 +133,7 @@ export async function sendLeadNotificationEmail(
 
   return sendEmail({
     to: recipientEmail,
-    subject: `You've been added as a lead in ColorTouch CRM by ${addedBy}`,
+    subject: `You've been added as a lead in XeniaCRM CRM by ${addedBy}`,
     html,
   });
 }

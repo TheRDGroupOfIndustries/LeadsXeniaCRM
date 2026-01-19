@@ -24,7 +24,7 @@ interface RazorpayPaymentProps {
 export default function RazorpayPayment({ 
   buttonText = "Pay Now", 
   amount: defaultAmount,
-  description = "Payment for ColorTouch CRM"
+  description = "Payment for XeniaCRM CRM"
 }: RazorpayPaymentProps) {
   const [loading, setLoading] = useState(false);
   const [amount, setAmount] = useState(defaultAmount || 100);
@@ -98,7 +98,7 @@ export default function RazorpayPayment({
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: orderData.amount,
         currency: orderData.currency,
-        name: "ColorTouch CRM",
+        name: "XeniaCRM CRM",
         description: description,
         order_id: orderData.orderId, // Make sure this matches API response
         image: "/logo.png", // Add your logo here
@@ -171,7 +171,7 @@ export default function RazorpayPayment({
           contact: "",
         },
         notes: {
-          address: "ColorTouch CRM Office",
+          address: "XeniaCRM CRM Office",
         },
         theme: {
           color: "#000000",

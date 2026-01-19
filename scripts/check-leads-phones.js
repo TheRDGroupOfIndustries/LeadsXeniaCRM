@@ -41,7 +41,7 @@ async function checkLeadsPhones() {
       
       if (leadsWithPhones.length === 0) {
         console.log('\n⚠️  WARNING: No leads have phone numbers!');
-        console.log('💡 Add phone numbers to your leads to receive WhatsApp messages.');
+        console.log('💡 Add phone numbers to your leads to contact them via campaigns.');
       } else {
         console.log(`\n🎯 Your campaign will be sent to ${leadsWithPhones.length} contacts.`);
       }

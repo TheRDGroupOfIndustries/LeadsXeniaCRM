@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
         _count: {
           select: {
             Lead: true,
-            WhatsappCampaign: true
+            Campaign: true
           }
         }
       },
@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
         ...emp,
         _count: {
           leads: emp._count?.Lead || 0,
-          campaigns: emp._count?.WhatsappCampaign || 0
+          campaigns: emp._count?.Campaign || 0
         }
       })),
       stats: {

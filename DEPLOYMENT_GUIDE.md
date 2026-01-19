@@ -1,4 +1,4 @@
-# ColorTouch CRM - Deployment & Offline Mode Guide
+# XeniaCRM CRM - Deployment & Offline Mode Guide
 
 ## 📋 Summary
 
@@ -20,7 +20,7 @@
 #### Changes Needed:
 1. **Database**: Ensure PostgreSQL is accessible from production server
    ```env
-   DATABASE_URL="postgresql://user:password@host:5432/colortouch"
+   DATABASE_URL="postgresql://user:password@host:5432/xeniacrm"
    ```
 
 2. **Environment Variables** (`.env.production`):
@@ -44,10 +44,6 @@
    # Razorpay (payment integration)
    RAZORPAY_KEY_ID=your_razorpay_key
    RAZORPAY_KEY_SECRET=your_razorpay_secret
-   
-   # WhatsApp (if using)
-   WHATSAPP_API_URL=your_whatsapp_api
-   WHATSAPP_API_KEY=your_api_key
    ```
 
 3. **Build and Deploy**:
@@ -122,9 +118,7 @@ npm run electron:build:linux  # Linux (.AppImage)
 
 3. **Payment Processing**: Razorpay API calls need internet
 
-4. **WhatsApp Campaigns**: External WhatsApp API required
-
-5. **Zapier Integrations**: Webhook delivery needs connectivity
+4. **Zapier Integrations**: Webhook delivery needs connectivity
 
 ---
 
@@ -183,7 +177,7 @@ User creates lead → Saved locally → Shows "⏱ Pending Sync" badge
 - [ ] Set up backup strategy for database
 - [ ] Configure CORS if API is on different domain
 - [ ] Test CSV upload with large files
-- [ ] Test WhatsApp campaign sending
+- [ ] Test campaign sending
 - [ ] Verify payment flow end-to-end
 
 ### For Desktop App:
@@ -192,7 +186,7 @@ User creates lead → Saved locally → Shows "⏱ Pending Sync" badge
 - [ ] Update `electron-builder.json` with your app details:
   ```json
   {
-    "appId": "com.yourcompany.colortouch",
+    "appId": "com.yourcompany.xeniacrm",
     "productName": "YourCompany CRM"
   }
   ```

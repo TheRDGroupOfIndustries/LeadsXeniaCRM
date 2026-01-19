@@ -222,7 +222,7 @@ Subscription Expiry: ${getExpiryDate(payment.paidAt, payment.createdAt)}
 
 ═══════════════════════════════════════════════════════════════
                     Thank you for your business!
-                         ColorTouch CRM
+                         XeniaCRM CRM
     `.trim();
 
     const blob = new Blob([invoiceContent], { type: "text/plain" });

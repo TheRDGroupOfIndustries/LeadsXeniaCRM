@@ -11,7 +11,6 @@ export interface UserData {
   name: string;
   email?: string | null;
   role?: string | null;
-  whatsapp?: string | null;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -47,7 +46,6 @@ const EmployeModels: React.FC<EmployeModelsProps> = ({
         name: user.name,
         email: user.email,
         role: user.role,
-        whatsapp: user.whatsapp,
       });
     } else {
       setFormData({});
@@ -138,7 +136,6 @@ const EmployeModels: React.FC<EmployeModelsProps> = ({
           {renderField("Full Name", "name")}
           {renderField("Email", "email", "email")}
           {renderField("Role", "role")}
-          {renderField("WhatsApp", "whatsapp")}
 
           {/* Footer */}
           {isEdit && (

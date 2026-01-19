@@ -739,7 +739,7 @@ export default function Dashboard() {
                 toast('Add leads before sending campaigns', { icon: '⚠️' });
                 return;
               }
-              router.push('/whatsapp');
+              router.push('/Campaigns');
             }}
             disabled={recentLeads.length === 0}
           >

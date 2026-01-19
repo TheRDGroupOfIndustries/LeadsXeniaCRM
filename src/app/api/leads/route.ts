@@ -145,7 +145,7 @@ export async function POST(req: NextRequest) {
           await prisma.user.create({
             data: {
               id: userId,
-              email: user.email || `${userId}@colortouch.app`,
+              email: user.email || `${userId}@xeniacrm.app`,
               name: user.name || "User",
               role: (user.role as Role) || "EMPLOYEE" as Role,
             },

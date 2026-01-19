@@ -1,5 +1,5 @@
 /**
- * ColorTouch CRM - Electron Main Process
+ * XeniaCRM CRM - Electron Main Process
  * Creates a native desktop window (NOT browser!)
  */
 
@@ -12,7 +12,7 @@ const fs = require('fs');
 // Configuration
 const SERVER_PORT = 3000;
 const SERVER_URL = `http://localhost:${SERVER_PORT}`;
-const APP_NAME = 'ColorTouch CRM';
+const APP_NAME = 'XeniaCRM CRM';
 
 let mainWindow = null;
 let serverProcess = null;
@@ -207,7 +207,7 @@ function createTray() {
     
     const contextMenu = Menu.buildFromTemplate([
         {
-            label: 'Open ColorTouch CRM',
+            label: 'Open XeniaCRM CRM',
             click: () => {
                 if (mainWindow) {
                     mainWindow.show();
@@ -286,7 +286,7 @@ function createLoadingWindow() {
         </head>
         <body>
             <div class="container">
-                <h1>ColorTouch CRM</h1>
+                <h1>XeniaCRM CRM</h1>
                 <p>Starting application...</p>
                 <div class="spinner"></div>
             </div>

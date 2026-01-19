@@ -1,9 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
-  "appId": "com.colortouch.crm",
-  "productName": "ColorTouch CRM",
+  "appId": "com.xeniacrm.crm",
+  "productName": "XeniaCRM CRM",
   "directories": {
-    "output": "ColorTouch-Desktop/installer-output"
+    "output": "XeniaCRM-Desktop/installer-output"
   },
   "files": [
     "electron/**/*",
@@ -11,12 +11,12 @@
   ],
   "extraResources": [
     {
-      "from": "ColorTouch-Desktop/server",
+      "from": "XeniaCRM-Desktop/server",
       "to": "server",
       "filter": ["**/*"]
     },
     {
-      "from": "ColorTouch-Desktop/resources",
+      "from": "XeniaCRM-Desktop/resources",
       "to": "resources",
       "filter": ["**/*"]
     },
@@ -41,7 +41,7 @@
     "allowToChangeInstallationDirectory": true,
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true,
-    "shortcutName": "ColorTouch CRM",
+    "shortcutName": "XeniaCRM CRM",
     "installerIcon": "build/icons/icons/win/icon.ico",
     "uninstallerIcon": "build/icons/icons/win/icon.ico"
   }

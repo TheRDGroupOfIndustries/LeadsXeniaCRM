@@ -1,5 +1,5 @@
 /**
- * ColorTouch CRM - Electron Desktop App Builder
+ * XeniaCRM CRM - Electron Desktop App Builder
  * Creates a NATIVE desktop application (not browser!)
  */
 
@@ -9,7 +9,7 @@ const path = require('path');
 const https = require('https');
 
 const ROOT = path.resolve(__dirname, '..');
-const OUTPUT = path.join(ROOT, 'ColorTouch-Desktop');
+const OUTPUT = path.join(ROOT, 'XeniaCRM-Desktop');
 const TEMP = path.join(ROOT, '.build-temp');
 
 const CONFIG = {
@@ -53,7 +53,7 @@ function download(url, dest) {
 
 async function build() {
     console.log('\n========================================');
-    console.log('  ColorTouch CRM - Electron App Builder');
+    console.log('  XeniaCRM CRM - Electron App Builder');
     console.log('  Creates NATIVE Desktop App Window');
     console.log('========================================\n');
     
@@ -99,10 +99,10 @@ async function build() {
     log('Creating desktop configuration...');
     const envContent = `NODE_ENV=production
 PORT=3000
-DATABASE_URL=file:./prisma/colortouch.db
+DATABASE_URL=file:./prisma/xeniacrm.db
 NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=colortouch-offline-desktop-${Date.now()}
-ADMIN_EMAIL=admin@colortouch.app
+NEXTAUTH_SECRET=xeniacrm-offline-desktop-${Date.now()}
+ADMIN_EMAIL=admin@xeniacrm.app
 DESKTOP_MODE=true
 OFFLINE_MODE=true
 `;

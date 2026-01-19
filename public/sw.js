@@ -1,6 +1,6 @@
-// ColorTouch CRM - Service Worker for Offline Support
-const CACHE_NAME = 'colortouch-v1';
-const RUNTIME_CACHE = 'colortouch-runtime-v1';
+// XeniaCRM CRM - Service Worker for Offline Support
+const CACHE_NAME = 'xeniacrm-v1';
+const RUNTIME_CACHE = 'xeniacrm-runtime-v1';
 
 // Files to cache immediately on install
 const PRECACHE_URLS = [
@@ -108,7 +108,7 @@ async function syncData() {
 // Push notifications support
 self.addEventListener('push', (event) => {
   const data = event.data?.json() ?? {};
-  const title = data.title || 'ColorTouch CRM';
+  const title = data.title || 'XeniaCRM CRM';
   const options = {
     body: data.body || 'New notification',
     icon: '/icons/icon-192x192.png',

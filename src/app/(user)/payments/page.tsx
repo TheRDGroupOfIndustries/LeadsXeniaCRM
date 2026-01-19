@@ -164,7 +164,7 @@ export default async function PaymentPage() {
                 </CardHeader>
                 <CardContent className="pb-8">
                   <div className="bg-black/60 rounded-xl p-6 border border-white/10">
-                    <RazorpayPayment description="Upgrade to ColorTouch CRM Premium" buttonText="Pay & Activate Premium" />
+                    <RazorpayPayment description="Upgrade to XeniaCRM CRM Premium" buttonText="Pay & Activate Premium" />
                   </div>
                   <div className="mt-4 flex items-center justify-center gap-2 text-sm text-gray-400">
                     <Shield className="h-4 w-4" />

@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
         user = await (prisma as any).user.create({
           data: {
             id: session.user.id,
-            email: session.user.email || `${session.user.id}@colortouch.app`,
+            email: session.user.email || `${session.user.id}@xeniacrm.app`,
             name: session.user.name || "Admin User",
             role: "ADMIN",
           }

@@ -166,7 +166,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
       // Only upsert for OAuth providers (Google), not for Credentials
       if (account?.provider === "google") {
-        // Determine role: only admin@colortouch.app gets ADMIN role, all others are EMPLOYEE
+        // Determine role: only admin@xeniacrm.app gets ADMIN role, all others are EMPLOYEE
         const role = user.email === process.env.ADMIN_EMAIL ? "ADMIN" : "EMPLOYEE";
 
         try {
