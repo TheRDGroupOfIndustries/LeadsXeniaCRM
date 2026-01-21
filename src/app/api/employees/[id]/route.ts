@@ -257,24 +257,58 @@ export async function GET(
     }
 
     try {
-      const employee = await prisma.user.findUnique({
-        where: { id: id },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          role: true,
-          subscription: true,
-          createdAt: true,
-          updatedAt: true,
-          _count: {
-            select: {
-              Lead: true,
-              Campaign: true
-            }
-          }
-        }
-      });
+      // Some deployments may not have the `Campaign` table yet.
+      // Retry without Campaign counts so Admin pages don't crash.
+      let employee: any = null;
+      let campaignCountsAvailable = true;
+
+      try {
+        employee = await prisma.user.findUnique({
+          where: { id: id },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+            subscription: true,
+            createdAt: true,
+            updatedAt: true,
+            _count: {
+              select: {
+                Lead: true,
+                Campaign: true,
+              },
+            },
+          },
+        });
+      } catch (err: any) {
+        const msg = err?.message ? String(err.message) : "";
+        const missingCampaignTable =
+          msg.includes("public.Campaign") ||
+          msg.includes('relation "Campaign" does not exist') ||
+          msg.includes("The table `public.Campaign` does not exist");
+
+        if (!missingCampaignTable) throw err;
+
+        campaignCountsAvailable = false;
+        employee = await prisma.user.findUnique({
+          where: { id: id },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+            subscription: true,
+            createdAt: true,
+            updatedAt: true,
+            _count: {
+              select: {
+                Lead: true,
+              },
+            },
+          },
+        });
+      }
 
       if (!employee) {
         return NextResponse.json(
@@ -285,7 +319,15 @@ export async function GET(
 
       return NextResponse.json({
         success: true,
-        employee
+        employee: employee
+          ? {
+              ...employee,
+              _count: {
+                leads: employee._count?.Lead || 0,
+                campaigns: campaignCountsAvailable ? (employee._count?.Campaign || 0) : 0,
+              },
+            }
+          : employee,
       });
 
     } catch (dbErr: any) {

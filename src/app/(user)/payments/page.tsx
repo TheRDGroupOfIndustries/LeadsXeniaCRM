@@ -23,15 +23,21 @@ export default async function PaymentPage() {
   const userId = session.user.id as string;
   const userRole = session.user.role as string;
 
-  // Fetch user subscription status
-  let user: { subscription: string | null } | null = null;
-  try {
-    user = await prisma.user.findUnique({ where: { id: userId }, select: { subscription: true } });
-  } catch (err) {
-    console.error("Failed to fetch user subscription:", err);
-  }
+  // Prefer subscription from session token to avoid DB lookups.
+  const sessionSubscription = (session.user as any).subscription as string | undefined;
 
-  const isPremium = user?.subscription === "PREMIUM";
+  // Fetch user subscription status (fallback to DB only if session is missing it)
+  let isPremium = sessionSubscription === 'PREMIUM';
+
+  if (sessionSubscription === undefined) {
+    try {
+      const user = await prisma.user.findUnique({ where: { id: userId }, select: { subscription: true } });
+      isPremium = user?.subscription === 'PREMIUM';
+    } catch {
+      // DB might be temporarily unreachable; treat as non-premium without crashing.
+      isPremium = false;
+    }
+  }
 
   // For admin users, show admin panel
   if (userRole === "ADMIN") {

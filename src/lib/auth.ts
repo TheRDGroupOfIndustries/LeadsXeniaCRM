@@ -102,11 +102,33 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                   email: user.email,
                   name: user.name,
                   role: "ADMIN",
+                  subscription: "PREMIUM",
                 };
               }
             }
           } catch (dbErr: any) {
-            console.error('Database error during admin login:', dbErr?.message || dbErr);
+            const msg = dbErr?.message ? String(dbErr.message) : String(dbErr);
+            console.error('Database error during admin login:', msg);
+
+            // If the DB is temporarily unreachable, still allow env-admin login.
+            // Many app features still need the DB, but this prevents a hard auth failure.
+            const isConnectivityIssue =
+              msg.includes("Can't reach database server") ||
+              msg.includes('PrismaClientInitializationError') ||
+              msg.includes('P1001') ||
+              msg.includes('ECONNREFUSED') ||
+              msg.includes('ETIMEDOUT');
+
+            if (isConnectivityIssue) {
+              return {
+                id: 'env-admin',
+                email: adminEmail,
+                name: process.env.ADMIN_NAME || 'Admin',
+                role: 'ADMIN',
+                subscription: 'PREMIUM',
+              };
+            }
+
             throw new Error("Database unavailable for admin login");
           }
 
@@ -225,7 +247,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             token.role = user.role || "EMPLOYEE";
             token.name = user.name || "";
             token.email = user.email || "";
-            token.subscription = "FREE";
+            const fallbackSub = (user as any).subscription as string | undefined;
+            token.subscription = fallbackSub || (token.role === "ADMIN" ? "PREMIUM" : "FREE");
           }
         }
       }

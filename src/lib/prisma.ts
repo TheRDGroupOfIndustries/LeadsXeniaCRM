@@ -14,7 +14,14 @@ const globalForPrisma = global as unknown as { prisma?: PrismaClient };
 
 // Build connection URL with Neon-optimized settings for scale
 const getDatabaseUrl = () => {
-  const baseUrl = process.env.DATABASE_URL || '';
+  const forceDirect = (process.env.FORCE_DIRECT_DB || '').toLowerCase() === 'true';
+  const preferredUrl =
+    (forceDirect && process.env.DIRECT_URL) ?
+      process.env.DIRECT_URL :
+    (process.env.NODE_ENV === 'development' && process.env.DIRECT_URL ? process.env.DIRECT_URL : process.env.DATABASE_URL) ||
+    '';
+
+  const baseUrl = preferredUrl;
   
   // Check if using SQLite (file: protocol)
   if (baseUrl.startsWith('file:')) {
@@ -26,8 +33,11 @@ const getDatabaseUrl = () => {
   // connection_limit: max connections per instance (Neon handles pooling)
   // pool_timeout: time to wait for connection from pool
   // connect_timeout: time to establish new connection
+  const isPooler = baseUrl.includes('-pooler.') || baseUrl.includes('pgbouncer=true');
   const separator = baseUrl.includes('?') ? '&' : '?';
-  return `${baseUrl}${separator}connect_timeout=30&pool_timeout=30&connection_limit=25&pgbouncer=true`;
+  const commonParams = 'connect_timeout=30&pool_timeout=30&connection_limit=25';
+  const pgbouncerParam = isPooler ? '&pgbouncer=true' : '';
+  return `${baseUrl}${separator}${commonParams}${pgbouncerParam}`;
 };
 
 const prisma =

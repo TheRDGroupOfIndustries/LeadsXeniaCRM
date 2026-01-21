@@ -21,24 +21,42 @@ export async function GET(
     const { id } = await context.params;
     const userId = user.id as string;
     
-    const reminder = await prisma.reminder.findFirst({
-      where: { 
-        id,
-        userId 
-      },
-      include: {
-        Lead: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            phone: true,
-            company: true,
-            tag: true
-          }
-        }
+    let reminder: any = null;
+    try {
+      reminder = await prisma.reminder.findFirst({
+        where: {
+          id,
+          userId,
+        },
+        include: {
+          Lead: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              phone: true,
+              company: true,
+              tag: true,
+            },
+          },
+        },
+      });
+    } catch (dbErr: any) {
+      const msg = dbErr?.message ? String(dbErr.message) : String(dbErr);
+      const isConnectivityIssue =
+        msg.includes("Can't reach database server") ||
+        msg.includes('PrismaClientInitializationError') ||
+        msg.includes('P1001') ||
+        msg.includes('ECONNREFUSED') ||
+        msg.includes('ETIMEDOUT');
+      if (isConnectivityIssue) {
+        return NextResponse.json(
+          { success: false, error: "Database unreachable. Please try again later." },
+          { status: 503 }
+        );
       }
-    });
+      throw dbErr;
+    }
     
     if (!reminder) {
       return NextResponse.json(
@@ -53,7 +71,8 @@ export async function GET(
     });
     
   } catch (error: any) {
-    console.error("Get reminder error:", error);
+    const msg = error?.message ? String(error.message) : String(error);
+    console.warn("Get reminder error:", msg);
     return NextResponse.json(
       { success: false, error: error.message || "Failed to fetch reminder" },
       { status: 500 }
@@ -82,9 +101,27 @@ export async function PUT(
     const body = await req.json();
     
     // Check if reminder exists and belongs to user
-    const existingReminder = await prisma.reminder.findFirst({
-      where: { id, userId }
-    });
+    let existingReminder: any = null;
+    try {
+      existingReminder = await prisma.reminder.findFirst({
+        where: { id, userId }
+      });
+    } catch (dbErr: any) {
+      const msg = dbErr?.message ? String(dbErr.message) : String(dbErr);
+      const isConnectivityIssue =
+        msg.includes("Can't reach database server") ||
+        msg.includes('PrismaClientInitializationError') ||
+        msg.includes('P1001') ||
+        msg.includes('ECONNREFUSED') ||
+        msg.includes('ETIMEDOUT');
+      if (isConnectivityIssue) {
+        return NextResponse.json(
+          { success: false, error: "Database unreachable. Please try again later." },
+          { status: 503 }
+        );
+      }
+      throw dbErr;
+    }
     
     if (!existingReminder) {
       return NextResponse.json(
@@ -95,28 +132,46 @@ export async function PUT(
     
     const { title, description, reminderDate, reminderType, priority, isCompleted } = body;
     
-    const updatedReminder = await prisma.reminder.update({
-      where: { id },
-      data: {
-        ...(title && { title }),
-        ...(description !== undefined && { description }),
-        ...(reminderDate && { reminderDate: new Date(reminderDate) }),
-        ...(reminderType && { reminderType }),
-        ...(priority && { priority }),
-        ...(isCompleted !== undefined && { isCompleted }),
-        updatedAt: new Date()
-      },
-      include: {
-        Lead: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            company: true
+    let updatedReminder: any = null;
+    try {
+      updatedReminder = await prisma.reminder.update({
+        where: { id },
+        data: {
+          ...(title && { title }),
+          ...(description !== undefined && { description }),
+          ...(reminderDate && { reminderDate: new Date(reminderDate) }),
+          ...(reminderType && { reminderType }),
+          ...(priority && { priority }),
+          ...(isCompleted !== undefined && { isCompleted }),
+          updatedAt: new Date()
+        },
+        include: {
+          Lead: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              company: true
+            }
           }
         }
+      });
+    } catch (dbErr: any) {
+      const msg = dbErr?.message ? String(dbErr.message) : String(dbErr);
+      const isConnectivityIssue =
+        msg.includes("Can't reach database server") ||
+        msg.includes('PrismaClientInitializationError') ||
+        msg.includes('P1001') ||
+        msg.includes('ECONNREFUSED') ||
+        msg.includes('ETIMEDOUT');
+      if (isConnectivityIssue) {
+        return NextResponse.json(
+          { success: false, error: "Database unreachable. Please try again later." },
+          { status: 503 }
+        );
       }
-    });
+      throw dbErr;
+    }
     
     return NextResponse.json({
       success: true,
@@ -125,7 +180,8 @@ export async function PUT(
     });
     
   } catch (error: any) {
-    console.error("Update reminder error:", error);
+    const msg = error?.message ? String(error.message) : String(error);
+    console.warn("Update reminder error:", msg);
     return NextResponse.json(
       { success: false, error: error.message || "Failed to update reminder" },
       { status: 500 }
@@ -153,9 +209,27 @@ export async function DELETE(
     const userId = user.id as string;
     
     // Check if reminder exists and belongs to user
-    const existingReminder = await prisma.reminder.findFirst({
-      where: { id, userId }
-    });
+    let existingReminder: any = null;
+    try {
+      existingReminder = await prisma.reminder.findFirst({
+        where: { id, userId }
+      });
+    } catch (dbErr: any) {
+      const msg = dbErr?.message ? String(dbErr.message) : String(dbErr);
+      const isConnectivityIssue =
+        msg.includes("Can't reach database server") ||
+        msg.includes('PrismaClientInitializationError') ||
+        msg.includes('P1001') ||
+        msg.includes('ECONNREFUSED') ||
+        msg.includes('ETIMEDOUT');
+      if (isConnectivityIssue) {
+        return NextResponse.json(
+          { success: false, error: "Database unreachable. Please try again later." },
+          { status: 503 }
+        );
+      }
+      throw dbErr;
+    }
 
     if (!existingReminder) {
       return NextResponse.json(
@@ -164,15 +238,35 @@ export async function DELETE(
       );
     }
 
-    await prisma.reminder.delete({
-      where: { id }
-    });    return NextResponse.json({
+    try {
+      await prisma.reminder.delete({
+        where: { id }
+      });
+    } catch (dbErr: any) {
+      const msg = dbErr?.message ? String(dbErr.message) : String(dbErr);
+      const isConnectivityIssue =
+        msg.includes("Can't reach database server") ||
+        msg.includes('PrismaClientInitializationError') ||
+        msg.includes('P1001') ||
+        msg.includes('ECONNREFUSED') ||
+        msg.includes('ETIMEDOUT');
+      if (isConnectivityIssue) {
+        return NextResponse.json(
+          { success: false, error: "Database unreachable. Please try again later." },
+          { status: 503 }
+        );
+      }
+      throw dbErr;
+    }
+
+    return NextResponse.json({
       success: true,
       message: "Reminder deleted successfully"
     });
     
   } catch (error: any) {
-    console.error("Delete reminder error:", error);
+    const msg = error?.message ? String(error.message) : String(error);
+    console.warn("Delete reminder error:", msg);
     return NextResponse.json(
       { success: false, error: error.message || "Failed to delete reminder" },
       { status: 500 }

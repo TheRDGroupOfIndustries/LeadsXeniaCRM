@@ -24,24 +24,58 @@ export async function GET(req: NextRequest) {
     }
     
     // Get all employees (users)
-    const employees = await prisma.user.findMany({
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        subscription: true,
-        createdAt: true,
-        updatedAt: true,
-        _count: {
-          select: {
-            Lead: true,
-            Campaign: true
-          }
-        }
-      },
-      orderBy: { createdAt: 'desc' }
-    });
+    // NOTE: Some deployments may not have the `Campaign` table yet (e.g. DB not migrated).
+    // In that case, retry the query without Campaign counts so the Admin UI still loads.
+    let employees: any[] = [];
+    let campaignCountsAvailable = true;
+
+    try {
+      employees = await prisma.user.findMany({
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          subscription: true,
+          createdAt: true,
+          updatedAt: true,
+          _count: {
+            select: {
+              Lead: true,
+              Campaign: true,
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+      });
+    } catch (err: any) {
+      const msg = err?.message ? String(err.message) : "";
+      const missingCampaignTable =
+        msg.includes("public.Campaign") ||
+        msg.includes('relation "Campaign" does not exist') ||
+        msg.includes("The table `public.Campaign` does not exist");
+
+      if (!missingCampaignTable) throw err;
+
+      campaignCountsAvailable = false;
+      employees = await prisma.user.findMany({
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          subscription: true,
+          createdAt: true,
+          updatedAt: true,
+          _count: {
+            select: {
+              Lead: true,
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+      });
+    }
     
     // Calculate stats
     const totalUsers = employees.length;
@@ -64,7 +98,7 @@ export async function GET(req: NextRequest) {
         ...emp,
         _count: {
           leads: emp._count?.Lead || 0,
-          campaigns: emp._count?.Campaign || 0
+          campaigns: campaignCountsAvailable ? (emp._count?.Campaign || 0) : 0
         }
       })),
       stats: {

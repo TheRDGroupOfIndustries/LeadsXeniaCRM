@@ -168,7 +168,9 @@ export async function GET(req: NextRequest) {
         ]
       });
     } catch (dbErr) {
-      console.error('Get reminders error:', dbErr);
+      const msg = (dbErr as any)?.message ? String((dbErr as any).message) : String(dbErr);
+      // Log a compact message to avoid dev overlay sourcemap spam.
+      console.warn('Get reminders DB error:', msg);
       // Return empty grouped structure when DB is unavailable
       return NextResponse.json({
         success: true,
@@ -185,7 +187,8 @@ export async function GET(req: NextRequest) {
           pending: 0,
           overdue: 0,
           completed: 0
-        }
+        },
+        warning: "Database unreachable. Showing empty reminders."
       });
     }
     
@@ -238,7 +241,8 @@ export async function GET(req: NextRequest) {
     });
     
   } catch (error: any) {
-    console.error("Get reminders error:", error);
+    const msg = error?.message ? String(error.message) : String(error);
+    console.warn("Get reminders error:", msg);
     return NextResponse.json(
       { success: false, error: error.message || "Failed to fetch reminders" },
       { status: 500 }
