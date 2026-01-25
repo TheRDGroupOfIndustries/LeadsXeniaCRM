@@ -17,10 +17,6 @@ interface LeadFormData {
   status?: string;
   duration?: number;
   amount?: number | null;
-  enquiryDate?: string;
-  bookingDate?: string;
-  checkInDates?: string;
-  checkoutDate?: string;
 }
 
 interface LeadsAddModalProps {
@@ -40,10 +36,6 @@ const LeadsAddModal: React.FC<LeadsAddModalProps> = ({ onClose, onLeadAdded }) =
     status: "PENDING",
     duration: 0,
     amount: null,
-    enquiryDate: "",
-    bookingDate: "",
-    checkInDates: "",
-    checkoutDate: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -268,49 +260,6 @@ const LeadsAddModal: React.FC<LeadsAddModalProps> = ({ onClose, onLeadAdded }) =
               />
             </div>
 
-            {/* Enquiry Date */}
-            <div>
-              <label className="text-sm text-zinc-400">Enquiry Date</label>
-              <Input
-                type="date"
-                value={formData.enquiryDate}
-                onChange={(e) => handleChange("enquiryDate", e.target.value)}
-                className="bg-zinc-900 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-blue-500 cursor-pointer"
-              />
-            </div>
-
-            {/* Booking Date */}
-            <div>
-              <label className="text-sm text-zinc-400">Booking Date</label>
-              <Input
-                type="date"
-                value={formData.bookingDate}
-                onChange={(e) => handleChange("bookingDate", e.target.value)}
-                className="bg-zinc-900 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-blue-500 cursor-pointer"
-              />
-            </div>
-
-            {/* Check-In Date */}
-            <div>
-              <label className="text-sm text-zinc-400">Check-In Date</label>
-              <Input
-                type="date"
-                value={formData.checkInDates}
-                onChange={(e) => handleChange("checkInDates", e.target.value)}
-                className="bg-zinc-900 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-blue-500 cursor-pointer"
-              />
-            </div>
-
-            {/* Check-Out Date */}
-            <div>
-              <label className="text-sm text-zinc-400">Check-Out Date</label>
-              <Input
-                type="date"
-                value={formData.checkoutDate}
-                onChange={(e) => handleChange("checkoutDate", e.target.value)}
-                className="bg-zinc-900 border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-blue-500 cursor-pointer"
-              />
-            </div>
           </div>
           </div>
         </div>

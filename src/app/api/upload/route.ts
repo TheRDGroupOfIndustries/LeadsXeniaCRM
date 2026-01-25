@@ -25,10 +25,6 @@ type LeadRow = {
   tag?: Tag;
   leadsCreatedDate?: string;
   leadsUpdatedDates?: string;
-  enquiryDate?: string;
-  bookingDate?: string;
-  checkInDates?: string;
-  checkoutDate?: string;
 };
 
 // Map incoming (possibly non-enum) tag values to valid Tag enum values.
@@ -204,10 +200,6 @@ export async function POST(req: NextRequest) {
             // Support CSVs that include date columns from user uploads
             else if (header.includes('leads created') || header.includes('leads created date') || header.includes('created date')) rowData['leadsCreatedDate'] = value;
             else if (header.includes('leads updated') || header.includes('leads updated dates') || header.includes('updated date')) rowData['leadsUpdatedDates'] = value;
-            else if (header.includes('enquiry')) rowData['enquiryDate'] = value;
-            else if (header.includes('booking')) rowData['bookingDate'] = value;
-            else if (header.includes('check in') || header.includes('check-in')) rowData['checkInDates'] = value;
-            else if (header.includes('checkout') || header.includes('check-out') || header.includes('check out')) rowData['checkoutDate'] = value;
             else if (header.includes('amount') || header.includes('value') || header.includes('price') || header.includes('revenue')) {
               rowData.amount = value;
             }
@@ -275,10 +267,6 @@ export async function POST(req: NextRequest) {
             // Support additional date columns
             else if (header.includes('leads created') || header.includes('leads created date') || header.includes('created date')) rowData['leadsCreatedDate'] = value;
             else if (header.includes('leads updated') || header.includes('leads updated dates') || header.includes('updated date')) rowData['leadsUpdatedDates'] = value;
-            else if (header.includes('enquiry')) rowData['enquiryDate'] = value;
-            else if (header.includes('booking')) rowData['bookingDate'] = value;
-            else if (header.includes('check in') || header.includes('check-in')) rowData['checkInDates'] = value;
-            else if (header.includes('checkout') || header.includes('check-out') || header.includes('check out')) rowData['checkoutDate'] = value;
             else if (header.includes('amount') || header.includes('value') || header.includes('price') || header.includes('revenue')) {
               rowData.amount = value;
             }
@@ -319,16 +307,6 @@ export async function POST(req: NextRequest) {
         // Extract optional date fields
         const createdAt = row['leadsCreatedDate'] ? new Date(String(row['leadsCreatedDate'])) : undefined;
         const updatedAt = row['leadsUpdatedDates'] ? new Date(String(row['leadsUpdatedDates'])) : undefined;
-        const enquiryDate = row['enquiryDate'] ? String(row['enquiryDate']).trim() : undefined;
-        const bookingDate = row['bookingDate'] ? String(row['bookingDate']).trim() : undefined;
-        const checkInDates = row['checkInDates'] ? String(row['checkInDates']).trim() : undefined;
-        const checkoutDate = row['checkoutDate'] ? String(row['checkoutDate']).trim() : undefined;
-
-        // Make checkout date mandatory
-        if (!checkoutDate) {
-          console.warn(`⚠️ Skipping lead "${name}" - checkout date is required`);
-          return null;
-        }
 
         const notesField = row.notes ? String(row.notes).trim().substring(0, 1000) : null;
 
@@ -348,24 +326,6 @@ export async function POST(req: NextRequest) {
         // Persist CSV date columns into their own DB fields (optional)
         if (createdAt && !isNaN(createdAt.getTime())) insertObj.leadsCreatedDate = createdAt;
         if (updatedAt && !isNaN(updatedAt.getTime())) insertObj.leadsUpdatedDates = updatedAt;
-
-        // Parse enquiry/booking/checkin/checkout date strings into Date objects where possible
-        if (enquiryDate) {
-          const d = new Date(enquiryDate);
-          if (!isNaN(d.getTime())) insertObj.enquiryDate = d;
-        }
-        if (bookingDate) {
-          const d = new Date(bookingDate);
-          if (!isNaN(d.getTime())) insertObj.bookingDate = d;
-        }
-        if (checkInDates) {
-          const d = new Date(checkInDates);
-          if (!isNaN(d.getTime())) insertObj.checkInDates = d;
-        }
-        if (checkoutDate) {
-          const d = new Date(checkoutDate);
-          if (!isNaN(d.getTime())) insertObj.checkoutDate = d;
-        }
 
         return insertObj;
       })

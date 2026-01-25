@@ -141,9 +141,6 @@ export default function LeadsUploader() {
                 <li><code>amount</code> – Deal amount/value (optional)</li>
                 <li><code>Leads created date</code> – Date lead was created (optional)</li>
                 <li><code>Leads updated dates</code> – Date lead was updated (optional)</li>
-                <li><code>Enquiry date</code> – Date of enquiry (optional)</li>
-                <li><code>Booking date</code> – Date of booking (optional)</li>
-                <li><code>Check in dates</code> – Check-in date (optional)</li>
               </ul>
               <p className="text-xs text-muted-foreground text-gray-400">Column headers are <strong>case-sensitive</strong>. Date format: YYYY-MM-DD</p>
             </div>
