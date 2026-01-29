@@ -55,7 +55,7 @@ export default function LoginPage() {
         <div className="bg-[#12123d]/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-[#2a2a6e]/50 p-8">
           {/* Logo */}
           <div className="flex justify-center mb-6">
-            <img src="/image.png" alt="Leads Xenia" className="h-16 w-20px" />
+            <img src="/navBarIcon.png" alt="Leads Xenia" className="h-20 w-22px" />
           </div>
           
           {/* Header */}
