@@ -234,6 +234,7 @@ enum Status {
 
 enum SubscriptionType {
   FREE
+  PENDING
   PREMIUM
 }
 

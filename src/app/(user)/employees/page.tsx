@@ -19,6 +19,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import AddEmployeeModal from "@/components/AddEmployeeModal";
+import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import toast, { Toaster } from "react-hot-toast";
 
 interface Employee {
@@ -66,11 +67,13 @@ export default function Employees() {
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({ name: "", email: "", role: "", subscription: "" });
   const [showAddModal, setShowAddModal] = useState(false);
+  const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; employeeId: string | null; employeeName: string }>({ isOpen: false, employeeId: null, employeeName: "" });
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Redirect non-admin users
   useEffect(() => {
     if (status === "loading") return;
-    
+
     if (!session) {
       router.push("/login");
       return;
@@ -87,10 +90,10 @@ export default function Employees() {
     try {
       setLoading(true);
       setWarning(null);
-      
+
       const res = await fetch("/api/employees", { cache: "no-store" });
       const data = await res.json();
-      
+
       if (!res.ok) {
         throw new Error(data.error || "Failed to fetch employees");
       }
@@ -116,26 +119,31 @@ export default function Employees() {
     }
   }, [session]);
 
-  const handleDeleteEmployee = async (employeeId: string) => {
-    if (!confirm("Are you sure you want to delete this employee?")) return;
+  const handleDeleteEmployee = async (employeeId: string, employeeName: string) => {
+    setDeleteModal({ isOpen: true, employeeId, employeeName });
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteModal.employeeId) return;
 
     try {
-      toast.loading("Deleting employee...");
-      const res = await fetch(`/api/employees/${employeeId}`, {
+      setIsDeleting(true);
+      const res = await fetch(`/api/employees/${deleteModal.employeeId}`, {
         method: "DELETE",
       });
-      
-      toast.dismiss();
-      
+
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error || "Failed to delete employee");
+        throw new Error(data.error || "Failed to delete user");
       }
 
-      toast.success("Employee deleted successfully");
-      fetchEmployees(); // Refresh the list
+      toast.success("User deleted successfully");
+      setDeleteModal({ isOpen: false, employeeId: null, employeeName: "" });
+      fetchEmployees();
     } catch (error: any) {
       toast.error(error.message);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -155,7 +163,7 @@ export default function Employees() {
 
   const handleUpdateEmployee = async () => {
     if (!editEmployee) return;
-    
+
     try {
       setIsEditing(true);
       const res = await fetch(`/api/employees/${editEmployee.id}`, {
@@ -163,17 +171,17 @@ export default function Employees() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(editForm)
       });
-      
+
       if (!res.ok) {
         const error = await res.json();
-        throw new Error(error.message || "Failed to update employee");
+        throw new Error(error.message || "Failed to update user");
       }
-      
-      toast.success("Employee updated successfully");
+
+      toast.success("User updated successfully");
       setEditEmployee(null);
       fetchEmployees();
     } catch (error: any) {
-      toast.error(error.message || "Failed to update employee");
+      toast.error(error.message || "Failed to update user");
     } finally {
       setIsEditing(false);
     }
@@ -209,17 +217,17 @@ export default function Employees() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold text-foreground">Employee Management</h2>
+          <h2 className="text-3xl font-bold text-foreground">User Management</h2>
           <p className="text-sm text-muted-foreground">
             Manage team members and their access levels
           </p>
         </div>
-        <Button 
+        <Button
           onClick={() => setShowAddModal(true)}
           className="bg-primary text-primary-foreground"
         >
           <Plus className="w-4 h-4 mr-2" />
-          Add Employee
+          Add User
         </Button>
       </div>
 
@@ -231,9 +239,9 @@ export default function Employees() {
               <Shield className="w-5 h-5 text-orange-600" />
               <span className="text-orange-800 dark:text-orange-200">{warning}</span>
             </div>
-            <Button 
-              onClick={fetchEmployees} 
-              size="sm" 
+            <Button
+              onClick={fetchEmployees}
+              size="sm"
               variant="outline"
               className="border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white"
             >
@@ -247,7 +255,7 @@ export default function Employees() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="p-6 bg-card border-border">
           <div className="flex items-start justify-between mb-4">
-            <p className="text-sm text-muted-foreground">Total Employees</p>
+            <p className="text-sm text-muted-foreground">Total Users</p>
             <Users className="w-6 h-6 text-info" />
           </div>
           <div className="text-3xl font-bold text-foreground">{stats.total}</div>
@@ -283,7 +291,7 @@ export default function Employees() {
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <Input
-            placeholder="Search employees..."
+            placeholder="Search users..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-10 bg-card border-border"
@@ -291,11 +299,11 @@ export default function Employees() {
         </div>
       </div>
 
-      {/* Employees Table */}
+      {/* Users Table */}
       <Card className="bg-card border-border">
         <div className="p-6 border-b border-border flex items-center justify-between">
           <h3 className="text-lg font-semibold text-foreground">
-            Employees ({filteredEmployees.length})
+            Users ({filteredEmployees.length})
           </h3>
         </div>
 
@@ -303,12 +311,12 @@ export default function Employees() {
           <div className="p-6 text-center">
             <div className="inline-flex items-center gap-3 text-muted-foreground">
               <div className="w-5 h-5 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin"></div>
-              <span>Loading employees...</span>
+              <span>Loading users...</span>
             </div>
           </div>
         ) : filteredEmployees.length === 0 ? (
           <div className="p-6 text-center text-muted-foreground">
-            {warning ? "Database unavailable - showing empty results" : "No employees found"}
+            {warning ? "Database unavailable - showing empty results" : "No users found"}
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -316,11 +324,11 @@ export default function Employees() {
               <thead className="border-b border-border">
                 <tr>
                   {[
-                    "Employee",
+                    "User",
                     "Role",
                     "Subscription",
                     "Leads",
-                    "Campaigns", 
+                    "Campaigns",
                     "Joined",
                     "Actions",
                   ].map((h) => (
@@ -367,7 +375,12 @@ export default function Employees() {
                       </span>
                     </td>
                     <td className="p-4">
-                      <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border-2 backdrop-blur-md ${employee.subscription === "PREMIUM" ? "bg-green-500/30 border-green-400/50 text-green-100" : "bg-black/40 border-gray-600/50 text-gray-200"}`}>
+                      <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border-2 backdrop-blur-md ${employee.subscription === "PREMIUM"
+                        ? "bg-green-500/30 border-green-400/50 text-green-100"
+                        : employee.subscription === "PENDING"
+                          ? "bg-yellow-500/30 border-yellow-400/50 text-yellow-100"
+                          : "bg-black/40 border-gray-600/50 text-gray-200"
+                        }`}>
                         {employee.subscription}
                       </span>
                     </td>
@@ -401,7 +414,7 @@ export default function Employees() {
                         variant="ghost"
                         size="sm"
                         className="h-8 w-8 p-0 text-red-500 hover:bg-red-500/10 hover:text-red-400"
-                        onClick={() => handleDeleteEmployee(employee.id)}
+                        onClick={() => handleDeleteEmployee(employee.id, employee.name)}
                       >
                         <Trash className="w-4 h-4" />
                       </Button>
@@ -414,12 +427,12 @@ export default function Employees() {
         )}
       </Card>
 
-      {/* View Employee Modal */}
+      {/* View User Modal */}
       {viewEmployee && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
           <div className="bg-black text-white p-6 rounded-lg max-w-md w-full mx-4 border border-gray-800 shadow-2xl">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-white">Employee Details</h3>
+              <h3 className="text-lg font-semibold text-white">User Details</h3>
               <Button
                 variant="ghost"
                 size="sm"
@@ -458,7 +471,12 @@ export default function Employees() {
                 <div>
                   <label className="text-sm text-muted-foreground">Subscription</label>
                   <div className="mt-1">
-                    <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border-2 backdrop-blur-md ${viewEmployee.subscription === "PREMIUM" ? "bg-green-500/30 border-green-400/50 text-green-100" : "bg-black/40 border-gray-600/50 text-gray-200"}`}>
+                    <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border-2 backdrop-blur-md ${viewEmployee.subscription === "PREMIUM"
+                        ? "bg-green-500/30 border-green-400/50 text-green-100"
+                        : viewEmployee.subscription === "PENDING"
+                          ? "bg-yellow-500/30 border-yellow-400/50 text-yellow-100"
+                          : "bg-black/40 border-gray-600/50 text-gray-200"
+                      }`}>
                       {viewEmployee.subscription}
                     </span>
                   </div>
@@ -489,12 +507,12 @@ export default function Employees() {
         </div>
       )}
 
-      {/* Edit Employee Modal */}
+      {/* Edit User Modal */}
       {editEmployee && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
           <div className="bg-black text-white p-6 rounded-lg max-w-md w-full mx-4 border border-gray-800 shadow-2xl">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-foreground">Edit Employee</h3>
+              <h3 className="text-lg font-semibold text-foreground">Edit User</h3>
               <Button
                 variant="ghost"
                 size="sm"
@@ -509,7 +527,7 @@ export default function Employees() {
                 <label className="text-sm text-muted-foreground block mb-1">Name</label>
                 <Input
                   value={editForm.name}
-                  onChange={(e) => setEditForm({...editForm, name: e.target.value})}
+                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
                   className="bg-background border-border"
                 />
               </div>
@@ -517,7 +535,7 @@ export default function Employees() {
                 <label className="text-sm text-muted-foreground block mb-1">Email</label>
                 <Input
                   value={editForm.email}
-                  onChange={(e) => setEditForm({...editForm, email: e.target.value})}
+                  onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
                   className="bg-background border-border"
                   type="email"
                 />
@@ -526,24 +544,26 @@ export default function Employees() {
                 <label className="text-sm text-muted-foreground block mb-1">Role</label>
                 <select
                   value={editForm.role}
-                  onChange={(e) => setEditForm({...editForm, role: e.target.value})}
+                  onChange={(e) => setEditForm({ ...editForm, role: e.target.value })}
                   className="w-full p-2 bg-black border border-border rounded-md text-white"
                 >
-                  <option value="EMPLOYEE" className="bg-black text-white">Employee</option>
+                  <option value="EMPLOYEE" className="bg-black text-white">User</option>
                   <option value="ADMIN" className="bg-black text-white">Admin</option>
                 </select>
               </div>
-              <div>
-                <label className="text-sm text-muted-foreground block mb-1">Subscription</label>
-                <select
-                  value={editForm.subscription}
-                  onChange={(e) => setEditForm({...editForm, subscription: e.target.value})}
-                  className="w-full p-2 bg-black border border-border rounded-md text-white"
-                >
-                  <option value="FREE" className="bg-black text-white">Free</option>
-                  <option value="PREMIUM" className="bg-black text-white">Premium</option>
-                </select>
-              </div>
+              {editForm.role !== "ADMIN" && (
+                <div>
+                  <label className="text-sm text-muted-foreground block mb-1">Subscription</label>
+                  <select
+                    value={editForm.subscription}
+                    onChange={(e) => setEditForm({ ...editForm, subscription: e.target.value })}
+                    className="w-full p-2 bg-black border border-border rounded-md text-white"
+                  >
+                    <option value="PENDING" className="bg-black text-yellow-400">Pending</option>
+                    <option value="PREMIUM" className="bg-black text-green-400">Premium</option>
+                  </select>
+                </div>
+              )}
               <div className="flex gap-3 pt-4">
                 <Button
                   onClick={() => setEditEmployee(null)}
@@ -555,7 +575,7 @@ export default function Employees() {
                 <Button
                   onClick={handleUpdateEmployee}
                   disabled={isEditing}
-                  className="flex-1"
+                  className="flex-1 border border-primary"
                 >
                   {isEditing ? "Updating..." : "Update"}
                 </Button>
@@ -564,12 +584,25 @@ export default function Employees() {
           </div>
         </div>
       )}
-      
+
       {/* Add Employee Modal */}
-      <AddEmployeeModal 
-        open={showAddModal} 
+      <AddEmployeeModal
+        open={showAddModal}
         close={() => setShowAddModal(false)}
         onCreated={fetchEmployees}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({ isOpen: false, employeeId: null, employeeName: "" })}
+        onConfirm={confirmDelete}
+        title="Delete User"
+        message={`Are you sure you want to delete "${deleteModal.employeeName}"? This action cannot be undone and will remove all their data.`}
+        confirmText="Delete User"
+        cancelText="Cancel"
+        variant="danger"
+        loading={isDeleting}
       />
     </div>
   );

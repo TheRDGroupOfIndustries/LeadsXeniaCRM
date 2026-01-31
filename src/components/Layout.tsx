@@ -44,7 +44,7 @@ interface LayoutProps {
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Employees", href: "/employees", icon: UsersRound },
+  { name: "Users", href: "/employees", icon: UsersRound },
   { name: "Lead Management", href: "/leads", icon: Users },
   { name: "Lead Follow-up", href: "/follow-up", icon: FileText },
   { name: "Payments", href: "/payments", icon: DollarSign },
@@ -196,12 +196,12 @@ export default function Layout({ children }: LayoutProps) {
   }
 
   const visibleNav = navigation.filter((item) => {
-    // Employees page only for admins
-    if (item.name === "Employees") {
+    // Users page only for admins
+    if (item.name === "Users") {
       return session?.user?.role === "ADMIN";
     }
 
-    // Invoice & Payments page - visible to both admin and employees
+    // Invoice & Payments page - visible to both admin and users
     if (item.name === "Invoice & Payments") {
       return session?.user?.role === "ADMIN" || session?.user?.role === "EMPLOYEE";
     }

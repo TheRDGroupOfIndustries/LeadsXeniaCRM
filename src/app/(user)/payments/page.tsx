@@ -1,10 +1,10 @@
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import RazorpayPayment from "@/components/ui/RazorpayPayment";
+import PaymentMethodSelector from "@/components/ui/PaymentMethodSelector";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { CheckCircle, Shield, Zap, Users, Crown } from "lucide-react";
+import { CheckCircle, Shield, Zap, Users, Crown, Clock, Sparkles } from "lucide-react";
 import AdminSubscriptionPanel from "@/components/AdminSubscriptionPanel";
 
 export default async function PaymentPage() {
@@ -26,16 +26,38 @@ export default async function PaymentPage() {
   // Prefer subscription from session token to avoid DB lookups.
   const sessionSubscription = (session.user as any).subscription as string | undefined;
 
-  // Fetch user subscription status (fallback to DB only if session is missing it)
-  let isPremium = sessionSubscription === 'PREMIUM';
+  // Fetch user subscription status from DB (always for accurate status)
+  let userSubscription = sessionSubscription;
+  let isPremium = false;
+  let isPending = false;
 
-  if (sessionSubscription === undefined) {
+  try {
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { subscription: true } });
+    userSubscription = user?.subscription || 'FREE';
+    isPremium = userSubscription === 'PREMIUM';
+    isPending = userSubscription === 'PENDING';
+  } catch {
+    // DB might be temporarily unreachable; use session value
+    isPremium = sessionSubscription === 'PREMIUM';
+    isPending = sessionSubscription === 'PENDING';
+  }
+
+  // Get pending payment details if user has PENDING subscription
+  let pendingPayment = null;
+  if (isPending && userRole === "EMPLOYEE") {
     try {
-      const user = await prisma.user.findUnique({ where: { id: userId }, select: { subscription: true } });
-      isPremium = user?.subscription === 'PREMIUM';
+      pendingPayment = await prisma.payment.findFirst({
+        where: {
+          userId: userId,
+          paymentMethod: "BANK_TRANSFER",
+          status: "PENDING"
+        },
+        orderBy: {
+          createdAt: "desc"
+        }
+      });
     } catch {
-      // DB might be temporarily unreachable; treat as non-premium without crashing.
-      isPremium = false;
+      // Ignore errors
     }
   }
 
@@ -75,6 +97,104 @@ export default async function PaymentPage() {
           <Link href="/dashboard">
             <Button>Go to Dashboard</Button>
           </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // If user has pending bank transfer, show confirmation page (no navigation allowed)
+  if (pendingPayment) {
+    // Parse payment details from notes
+    let paymentDetails: any = {};
+    try {
+      paymentDetails = JSON.parse(pendingPayment.notes || "{}");
+    } catch {
+      // Ignore parse errors
+    }
+
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6">
+        <div className="w-full max-w-md text-center space-y-6">
+          {/* Animated Success Icon */}
+          <div className="relative mx-auto w-24 h-24">
+            <div className="absolute inset-0 bg-emerald-500/20 rounded-full animate-ping" />
+            <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/30">
+              <CheckCircle className="h-12 w-12 text-white" />
+            </div>
+          </div>
+
+          {/* Main Heading */}
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold text-white">
+              Payment Submitted Successfully!
+            </h2>
+            <p className="text-emerald-400 font-medium">
+              Your payment is under review
+            </p>
+          </div>
+
+          {/* Payment Details */}
+          <div className="bg-zinc-900/80 border border-zinc-700 rounded-xl p-5 space-y-4">
+            <div className="flex items-center justify-center gap-2 text-blue-400">
+              <Clock className="h-5 w-5" />
+              <span className="font-medium">Estimated verification time: 24 hours</span>
+            </div>
+
+            <div className="bg-zinc-800/50 rounded-lg p-3 text-left">
+              <div className="flex justify-between text-sm mb-2">
+                <span className="text-zinc-400">Payment ID:</span>
+                <span className="text-white font-mono">{pendingPayment.orderId}</span>
+              </div>
+              <div className="flex justify-between text-sm mb-2">
+                <span className="text-zinc-400">Amount:</span>
+                <span className="text-emerald-400 font-bold">₹{pendingPayment.amount}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-zinc-400">Submitted:</span>
+                <span className="text-white">{paymentDetails.submittedAt || new Date(pendingPayment.createdAt).toLocaleString()}</span>
+              </div>
+            </div>
+
+            <p className="text-zinc-300 text-sm leading-relaxed">
+              Our team at <span className="text-white font-semibold">LeadsXenia</span> is reviewing your payment.
+              You'll receive a confirmation email once your premium subscription is activated.
+            </p>
+          </div>
+
+          {/* What Happens Next */}
+          <div className="bg-zinc-800/50 border border-zinc-700/50 rounded-xl p-5 text-left">
+            <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-yellow-400" />
+              What happens next?
+            </h3>
+            <ul className="space-y-2 text-sm text-zinc-400">
+              <li className="flex items-start gap-2">
+                <span className="w-5 h-5 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">1</span>
+                <span>Our team verifies your payment screenshot</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="w-5 h-5 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">2</span>
+                <span>Your account is upgraded to Premium</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="w-5 h-5 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">3</span>
+                <span>You receive a confirmation email with details</span>
+              </li>
+            </ul>
+          </div>
+
+          {/* Info Message - No navigation allowed */}
+          <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 text-center">
+            <p className="text-blue-400 text-sm">
+              🔒 You'll be able to access your dashboard once your payment is verified.
+            </p>
+            <p className="text-zinc-500 text-xs mt-2">
+              Need help? Email us at{" "}
+              <a href="mailto:support@leadsxenia.com" className="text-blue-400 hover:underline">
+                support@leadsxenia.com
+              </a>
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -125,7 +245,7 @@ export default async function PaymentPage() {
                   Transform your CRM experience with advanced automation, deep analytics, and priority support.
                 </p>
               </div>
-              
+
               {/* Feature highlights */}
               <div className="grid gap-4 sm:grid-cols-3">
                 <div className="p-4 rounded-xl bg-white/5 border border-white/10">
@@ -133,13 +253,13 @@ export default async function PaymentPage() {
                   <div className="font-medium text-white mb-1">Automation Suite</div>
                   <div className="text-sm text-gray-400">Bulk messaging, smart follow-ups</div>
                 </div>
-                
+
                 <div className="p-4 rounded-xl bg-white/5 border border-white/10">
                   <Zap className="h-6 w-6 text-yellow-400 mb-3" />
                   <div className="font-medium text-white mb-1">Real-time Insights</div>
                   <div className="text-sm text-gray-400">Conversion metrics & dashboards</div>
                 </div>
-                
+
                 <div className="p-4 rounded-xl bg-white/5 border border-white/10">
                   <Shield className="h-6 w-6 text-blue-400 mb-3" />
                   <div className="font-medium text-white mb-1">Priority Support</div>
@@ -152,7 +272,7 @@ export default async function PaymentPage() {
 
         {/* Main Content - Two Column Layout */}
         <div className="grid gap-8 lg:grid-cols-2">
-          
+
           {/* Left Column - Payment/Status */}
           <div>
             {!isPremium ? (
@@ -170,7 +290,7 @@ export default async function PaymentPage() {
                 </CardHeader>
                 <CardContent className="pb-8">
                   <div className="bg-black/60 rounded-xl p-6 border border-white/10">
-                    <RazorpayPayment description="Upgrade to XeniaCRM CRM Premium" buttonText="Pay & Activate Premium" />
+                    <PaymentMethodSelector description="Upgrade to XeniaCRM CRM Premium" buttonText="Pay & Activate Premium" />
                   </div>
                   <div className="mt-4 flex items-center justify-center gap-2 text-sm text-gray-400">
                     <Shield className="h-4 w-4" />
@@ -197,7 +317,7 @@ export default async function PaymentPage() {
                     </div>
                     <div className="text-emerald-200 text-sm">Active • Unlimited access</div>
                   </div>
-                  
+
                   <div className="grid grid-cols-2 gap-4">
                     <div className="bg-white/10 rounded-lg p-3 text-center border border-white/20">
                       <div className="text-xl font-bold text-white">∞</div>
@@ -232,7 +352,7 @@ export default async function PaymentPage() {
               </CardHeader>
               <CardContent className="pb-8">
                 <div className="space-y-6">
-                  
+
                   {/* Unlimited Campaigns */}
                   <div className="flex items-start gap-4 p-4 rounded-xl bg-white/5 border border-white/10">
                     <div className="rounded-lg bg-emerald-500/20 border border-emerald-400/30 p-2">

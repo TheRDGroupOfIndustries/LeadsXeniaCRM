@@ -27,12 +27,16 @@ interface LeadsEditModalProps {
   onLeadUpdated: () => void;
 }
 
-const TAG_OPTIONS = ["HOT", "WARM", "COLD", "QUALIFIED", "DISQUALIFIED"];
 const STATUS_OPTIONS = [
-  { value: "PENDING", label: "Pending" },
-  { value: "FOLLOW_UP", label: "Follow Up" },
-  { value: "CONVERTED", label: "Converted" },
-  { value: "REJECTED", label: "Rejected" },
+  "PENDING",
+  "FOLLOW_UP",
+  "CONVERTED",
+  "REJECTED",
+  "HOT",
+  "WARM",
+  "COLD",
+  "QUALIFIED",
+  "DISQUALIFIED",
 ];
 
 const LeadsEditModal: React.FC<LeadsEditModalProps> = ({
@@ -57,7 +61,6 @@ const LeadsEditModal: React.FC<LeadsEditModalProps> = ({
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [tagOpen, setTagOpen] = useState(false);
   const [statusOpen, setStatusOpen] = useState(false);
 
   // ✅ Fetch lead details
@@ -202,40 +205,7 @@ const LeadsEditModal: React.FC<LeadsEditModalProps> = ({
 
           {/* Right Side */}
           <div className="space-y-4">
-            {/* ✅ Tag Dropdown */}
-            <div className="relative">
-              <label className="text-sm text-zinc-400">Tag</label>
-              <button
-                type="button"
-                onClick={() => setTagOpen(!tagOpen)}
-                className="w-full flex justify-between items-center bg-zinc-900 border border-zinc-700 text-zinc-100 rounded-md px-3 py-2 text-sm hover:bg-zinc-800"
-              >
-                {formData.tag ? formData.tag.toUpperCase() : "Select Tag"}
-                <ChevronDown
-                  className={`h-4 w-4 transition-transform ${tagOpen ? "rotate-180" : ""}`}
-                />
-              </button>
-              {tagOpen && (
-                <div className="absolute left-0 mt-1 w-full rounded-md border border-zinc-700 bg-zinc-900 shadow-lg z-50">
-                  {TAG_OPTIONS.map((tag) => (
-                    <button
-                      key={tag}
-                      onClick={() => {
-                        handleChange("tag", tag);
-                        setTagOpen(false);
-                      }}
-                      className={`w-full text-left px-4 py-2 text-sm hover:bg-zinc-800 ${
-                        formData.tag === tag ? "text-white font-semibold bg-zinc-800" : "text-zinc-200"
-                      }`}
-                    >
-                      {tag}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* ✅ Status Dropdown */}
+            {/* ✅ Status Dropdown - Combined with Tag options */}
             <div className="relative">
               <label className="text-sm text-zinc-400">Status</label>
               <button
@@ -243,32 +213,37 @@ const LeadsEditModal: React.FC<LeadsEditModalProps> = ({
                 onClick={() => setStatusOpen(!statusOpen)}
                 className="w-full flex justify-between items-center bg-zinc-900 border border-zinc-700 text-zinc-100 rounded-md px-3 py-2 text-sm hover:bg-zinc-800"
               >
-                {STATUS_OPTIONS.find(s => s.value === formData.status)?.label || "Select Status"}
+                {formData.status === "FOLLOW_UP" ? "Follow Up" : formData.status || "PENDING"}
                 <ChevronDown
                   className={`h-4 w-4 transition-transform ${statusOpen ? "rotate-180" : ""}`}
                 />
               </button>
               {statusOpen && (
-                <div className="absolute left-0 mt-1 w-full rounded-md border border-zinc-700 bg-zinc-900 shadow-lg z-50">
+                <div className="absolute left-0 mt-1 w-full rounded-md border border-zinc-700 bg-zinc-900 shadow-lg z-50 max-h-60 overflow-y-auto">
                   {STATUS_OPTIONS.map((status) => (
                     <button
-                      key={status.value}
+                      key={status}
                       onClick={() => {
-                        handleChange("status", status.value);
+                        handleChange("status", status);
                         setStatusOpen(false);
                       }}
                       className={`w-full text-left px-4 py-2 text-sm hover:bg-zinc-800 ${
-                        formData.status === status.value ? "text-white font-semibold bg-zinc-800" : "text-zinc-200"
+                        formData.status === status ? "text-white font-semibold bg-zinc-800" : "text-zinc-200"
                       }`}
                     >
                       <span className="flex items-center gap-2">
                         <span className={`w-2 h-2 rounded-full ${
-                          status.value === 'PENDING' ? 'bg-blue-400' :
-                          status.value === 'FOLLOW_UP' ? 'bg-orange-400' :
-                          status.value === 'CONVERTED' ? 'bg-green-400' :
-                          'bg-red-400'
+                          status === 'PENDING' ? 'bg-blue-400' :
+                          status === 'FOLLOW_UP' ? 'bg-orange-400' :
+                          status === 'CONVERTED' ? 'bg-green-400' :
+                          status === 'REJECTED' ? 'bg-red-400' :
+                          status === 'HOT' ? 'bg-red-500' :
+                          status === 'WARM' ? 'bg-yellow-400' :
+                          status === 'COLD' ? 'bg-cyan-400' :
+                          status === 'QUALIFIED' ? 'bg-emerald-400' :
+                          'bg-gray-400'
                         }`}></span>
-                        {status.label}
+                        {status === "FOLLOW_UP" ? "Follow Up" : status}
                       </span>
                     </button>
                   ))}

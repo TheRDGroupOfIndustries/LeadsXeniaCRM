@@ -47,7 +47,7 @@ const AdminSubscriptionPanel: React.FC = () => {
       setLoading(true);
       const res = await fetch("/api/employees", { cache: "no-store" });
       const data = await res.json();
-      
+
       if (!res.ok) {
         throw new Error(data.error || "Failed to fetch users");
       }
@@ -74,12 +74,12 @@ const AdminSubscriptionPanel: React.FC = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ subscription: newSubscription }),
       });
-      
+
       if (!res.ok) {
         const error = await res.json();
         throw new Error(error.message || "Failed to update subscription");
       }
-      
+
       toast.success(`Subscription updated to ${newSubscription}`);
       fetchUsers(); // Refresh the list
     } catch (error: any) {
@@ -161,7 +161,7 @@ const AdminSubscriptionPanel: React.FC = () => {
             className="pl-10 bg-card border-border"
           />
         </div>
-        <Button 
+        <Button
           onClick={fetchUsers}
           variant="outline"
           className="border-border"
@@ -223,7 +223,7 @@ const AdminSubscriptionPanel: React.FC = () => {
                         </span>
                       </td>
                       <td className="p-4">
-                        <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border-2 backdrop-blur-md ${user.subscription === "PREMIUM" ? "bg-green-500/30 border-green-400/50 text-green-100" : "bg-black/40 border-gray-600/50 text-gray-200"}`}>
+                        <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border-2 backdrop-blur-md ${user.subscription === "PREMIUM" ? "bg-green-500/30 border-green-400/50 text-green-100" : user.subscription === "PENDING" ? "bg-yellow-500/30 border-yellow-400/50 text-yellow-100" : "bg-black/40 border-gray-600/50 text-gray-200"}`}>
                           {user.subscription}
                         </span>
                       </td>
@@ -243,9 +243,9 @@ const AdminSubscriptionPanel: React.FC = () => {
                             size="sm"
                             variant={user.subscription === "PREMIUM" ? "destructive" : "default"}
                             disabled={updating === user.id}
-                            onClick={() => 
+                            onClick={() =>
                               handleSubscriptionUpdate(
-                                user.id, 
+                                user.id,
                                 user.subscription === "PREMIUM" ? "FREE" : "PREMIUM"
                               )
                             }

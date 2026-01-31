@@ -19,14 +19,14 @@ export async function PUT(
     const { id } = await context.params;
     const session = await auth();
     const user = session?.user;
-    
+
     if (!user || !user.id) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
         { status: 401 }
       );
     }
-    
+
     // Only admins can update employee details
     if (user.role !== "ADMIN") {
       return NextResponse.json(
@@ -69,7 +69,7 @@ export async function PUT(
             { status: 400 }
           );
         }
-        
+
         // Check if email is already taken by another user
         const emailExists = await prisma.user.findFirst({
           where: {
@@ -77,14 +77,14 @@ export async function PUT(
             id: { not: id }
           }
         });
-        
+
         if (emailExists) {
           return NextResponse.json(
             { success: false, error: "Email is already taken" },
             { status: 400 }
           );
         }
-        
+
         updateData.email = body.email.trim();
       }
 
@@ -96,7 +96,7 @@ export async function PUT(
           );
         }
         updateData.role = body.role;
-        
+
         // Auto-set PREMIUM subscription for ADMIN role
         if (body.role === "ADMIN") {
           updateData.subscription = "PREMIUM";
@@ -104,9 +104,9 @@ export async function PUT(
       }
 
       if (body.subscription !== undefined) {
-        if (!["FREE", "PREMIUM"].includes(body.subscription)) {
+        if (!["FREE", "PENDING", "PREMIUM"].includes(body.subscription)) {
           return NextResponse.json(
-            { success: false, error: "Invalid subscription. Must be FREE or PREMIUM" },
+            { success: false, error: "Invalid subscription. Must be FREE, PENDING, or PREMIUM" },
             { status: 400 }
           );
         }
@@ -170,14 +170,14 @@ export async function DELETE(
     const { id } = await context.params;
     const session = await auth();
     const user = session?.user;
-    
+
     if (!user || !user.id) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
         { status: 401 }
       );
     }
-    
+
     // Only admins can delete employees
     if (user.role !== "ADMIN") {
       return NextResponse.json(
@@ -240,14 +240,14 @@ export async function GET(
   try {
     const { id } = await context.params;
     const session = await auth();
-    
+
     if (!session?.user?.id) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
         { status: 401 }
       );
     }
-    
+
     // Only admins can view employee details
     if (session.user?.role !== "ADMIN") {
       return NextResponse.json(
@@ -321,12 +321,12 @@ export async function GET(
         success: true,
         employee: employee
           ? {
-              ...employee,
-              _count: {
-                leads: employee._count?.Lead || 0,
-                campaigns: campaignCountsAvailable ? (employee._count?.Campaign || 0) : 0,
-              },
-            }
+            ...employee,
+            _count: {
+              leads: employee._count?.Lead || 0,
+              campaigns: campaignCountsAvailable ? (employee._count?.Campaign || 0) : 0,
+            },
+          }
           : employee,
       });
 

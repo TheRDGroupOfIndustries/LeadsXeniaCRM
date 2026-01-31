@@ -57,10 +57,10 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ open, close, onCrea
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Failed to create employee");
+        throw new Error(data.error || "Failed to create user");
       }
 
-      toast.success("Employee created successfully!");
+      toast.success("User created successfully!");
       setFormData({
         name: "",
         email: "",
@@ -71,7 +71,7 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ open, close, onCrea
       close();
       if (onCreated) onCreated();
     } catch (error: any) {
-      toast.error(error.message || "Failed to create employee");
+      toast.error(error.message || "Failed to create user");
     } finally {
       setSaving(false);
     }
@@ -86,7 +86,7 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ open, close, onCrea
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-xl font-semibold text-white flex items-center gap-2">
             <UserPlus className="w-5 h-5" />
-            Add New Employee
+            Add New User
           </h3>
           <Button
             variant="ghost"
@@ -172,54 +172,56 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ open, close, onCrea
                             : "text-zinc-200"
                         }`}
                       >
-                        {role}
+                        {role === "EMPLOYEE" ? "User" : role}
                       </button>
                     ))}
                   </div>
                 )}
               </div>
 
-              {/* Subscription Dropdown */}
-              <div className="relative">
-                <label className="text-sm text-gray-400">Subscription</label>
-                <button
-                  type="button"
-                  onClick={() => setSubOpen(!subOpen)}
-                  className="w-full flex justify-between items-center bg-zinc-900 border border-zinc-700 text-zinc-100 rounded-md px-3 py-2 text-sm hover:bg-zinc-800"
-                >
-                  {formData.subscription}
-                  <ChevronDown
-                    className={`h-4 w-4 transition-transform ${
-                      subOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
-                {subOpen && (
-                  <div className="absolute left-0 mt-1 w-full rounded-md border border-zinc-700 bg-zinc-900 shadow-lg z-50">
-                    {SUBSCRIPTION_OPTIONS.map((sub) => (
-                      <button
-                        key={sub}
-                        type="button"
-                        onClick={() => {
-                          handleChange("subscription", sub);
-                          setSubOpen(false);
-                        }}
-                        className={`w-full text-left px-4 py-2 text-sm hover:bg-zinc-800 ${
-                          formData.subscription === sub
-                            ? "text-white font-semibold bg-zinc-800"
-                            : "text-zinc-200"
-                        }`}
-                      >
-                        {sub}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              {/* Subscription Dropdown - Only show for non-admin users */}
+              {formData.role !== "ADMIN" && (
+                <div className="relative">
+                  <label className="text-sm text-gray-400">Subscription</label>
+                  <button
+                    type="button"
+                    onClick={() => setSubOpen(!subOpen)}
+                    className="w-full flex justify-between items-center bg-zinc-900 border border-zinc-700 text-zinc-100 rounded-md px-3 py-2 text-sm hover:bg-zinc-800"
+                  >
+                    {formData.subscription}
+                    <ChevronDown
+                      className={`h-4 w-4 transition-transform ${
+                        subOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+                  {subOpen && (
+                    <div className="absolute left-0 mt-1 w-full rounded-md border border-zinc-700 bg-zinc-900 shadow-lg z-50">
+                      {SUBSCRIPTION_OPTIONS.map((sub) => (
+                        <button
+                          key={sub}
+                          type="button"
+                          onClick={() => {
+                            handleChange("subscription", sub);
+                            setSubOpen(false);
+                          }}
+                          className={`w-full text-left px-4 py-2 text-sm hover:bg-zinc-800 ${
+                            formData.subscription === sub
+                              ? "text-white font-semibold bg-zinc-800"
+                              : "text-zinc-200"
+                          }`}
+                        >
+                          {sub}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div className="pt-4">
                 <p className="text-xs text-gray-500">
-                  * Required fields. The new employee will receive login credentials via email.
+                  * Required fields. The new user will receive login credentials via email.
                 </p>
               </div>
             </div>
@@ -248,7 +250,7 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ open, close, onCrea
               ) : (
                 <>
                   <UserPlus className="w-4 h-4 mr-2" />
-                  Create Employee
+                  Create User
                 </>
               )}
             </Button>

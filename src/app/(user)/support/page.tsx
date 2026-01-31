@@ -50,7 +50,7 @@ export default function SupportPage() {
     },
     {
       question: "How do I add team members?",
-      answer: "Admins can add employees from the Employees page using the 'Add Employee' button."
+      answer: "Admins can add users from the Users page using the 'Add User' button."
     }
   ];
 
@@ -106,7 +106,7 @@ export default function SupportPage() {
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
               placeholder="What do you need help with?"
-              className="bg-black border-border"
+              className="bg-white text-black border-border placeholder:text-gray-500"
             />
           </div>
           <div>
@@ -115,7 +115,7 @@ export default function SupportPage() {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Describe your issue or question..."
-              className="bg-black border-border min-h-[120px]"
+              className="bg-white text-black border-border min-h-[120px] placeholder:text-gray-500"
             />
           </div>
           <Button 

@@ -94,34 +94,62 @@ interface GroupedReminders {
 }
 
 export default function Dashboard() {
-  const { data: session } = useSession();
+  const { data: session, status: sessionStatus } = useSession();
   const router = useRouter();
 
   const user = session?.user as any;
   const isAdmin = user?.role === "ADMIN";
 
+  // Track whether we're checking subscription for redirect
+  const [redirectChecking, setRedirectChecking] = useState(true);
+
   // If employee and not premium, redirect to payments
   useEffect(() => {
     const checkAndRedirect = async () => {
       try {
-        const user = session?.user as any;
-        if (!user || !user.id) return;
-        if (user.role !== "EMPLOYEE") return;
+        // Wait for session to load
+        if (sessionStatus === "loading") return;
 
+        const user = session?.user as any;
+        if (!user || !user.id) {
+          setRedirectChecking(false);
+          return;
+        }
+
+        // Admin users don't need subscription check
+        if (user.role !== "EMPLOYEE") {
+          setRedirectChecking(false);
+          return;
+        }
+
+        // Check subscription from session first (faster)
+        const sessionSubscription = user.subscription;
+        if (sessionSubscription === "PREMIUM") {
+          setRedirectChecking(false);
+          return;
+        }
+
+        // Double-check with API for accuracy
         const res = await fetch(`/api/auth/user/${user.id}`);
-        if (!res.ok) return;
+        if (!res.ok) {
+          setRedirectChecking(false);
+          return;
+        }
         const data = await res.json();
         const subscription = data.subscription as string | undefined;
         if (subscription !== "PREMIUM") {
           router.replace("/payments");
+          return; // Don't set redirectChecking false, we're navigating away
         }
+        setRedirectChecking(false);
       } catch (err) {
         console.error("Failed to check subscription for redirect:", err);
+        setRedirectChecking(false);
       }
     };
 
     checkAndRedirect();
-  }, [session, router]);
+  }, [session, sessionStatus, router]);
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
   const [recentLeads, setRecentLeads] = useState<Lead[]>([]);
   const [reminders, setReminders] = useState<GroupedReminders | null>(null);
@@ -172,11 +200,11 @@ export default function Dashboard() {
       });
 
       console.log("Reminders API response status:", remindersRes.status);
-      
+
       if (remindersRes.ok) {
         const remindersData = await remindersRes.json();
         console.log("Reminders data received:", remindersData);
-        
+
         if (remindersData.success && remindersData.groupedReminders) {
           setReminders(remindersData.groupedReminders);
           setReminderStats(remindersData.stats);
@@ -223,7 +251,7 @@ export default function Dashboard() {
       }
 
       toast.success("Reminder deleted successfully");
-      
+
       // Refresh the dashboard data to update the reminders list
       await fetchDashboardData();
     } catch (error: any) {
@@ -283,12 +311,13 @@ export default function Dashboard() {
     });
   };
 
-  if (loading) {
+  // Show loading during redirect check or data fetch
+  if (redirectChecking || loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="inline-flex items-center gap-3 text-muted-foreground">
           <div className="w-6 h-6 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin"></div>
-          <span>Loading dashboard...</span>
+          <span>{redirectChecking ? "Checking subscription..." : "Loading dashboard..."}</span>
         </div>
       </div>
     );
@@ -339,11 +368,10 @@ export default function Dashboard() {
                     {metrics.totalRevenue.formatted}
                   </span>
                   <span
-                    className={`text-xs font-medium flex items-center gap-1 ${
-                      metrics.totalRevenue.trend === "up"
-                        ? "text-green-600"
-                        : "text-red-600"
-                    }`}
+                    className={`text-xs font-medium flex items-center gap-1 ${metrics.totalRevenue.trend === "up"
+                      ? "text-green-600"
+                      : "text-red-600"
+                      }`}
                   >
                     {metrics.totalRevenue.trend === "up" ? (
                       <TrendingUp className="w-3 h-3" />
@@ -373,11 +401,10 @@ export default function Dashboard() {
                     {metrics.newLeads.formatted}
                   </span>
                   <span
-                    className={`text-xs font-medium flex items-center gap-1 ${
-                      metrics.newLeads.trend === "up"
-                        ? "text-green-600"
-                        : "text-red-600"
-                    }`}
+                    className={`text-xs font-medium flex items-center gap-1 ${metrics.newLeads.trend === "up"
+                      ? "text-green-600"
+                      : "text-red-600"
+                      }`}
                   >
                     {metrics.newLeads.trend === "up" ? (
                       <TrendingUp className="w-3 h-3" />
@@ -410,11 +437,10 @@ export default function Dashboard() {
                         {metrics.activeEmployees.formatted}
                       </span>
                       <span
-                        className={`text-xs font-medium flex items-center gap-1 ${
-                          metrics.activeEmployees.trend === "up"
-                            ? "text-green-600"
-                            : "text-red-600"
-                        }`}
+                        className={`text-xs font-medium flex items-center gap-1 ${metrics.activeEmployees.trend === "up"
+                          ? "text-green-600"
+                          : "text-red-600"
+                          }`}
                       >
                         {metrics.activeEmployees.trend === "up" ? (
                           <TrendingUp className="w-3 h-3" />
@@ -444,11 +470,10 @@ export default function Dashboard() {
                         {metrics.conversionRate.formatted}
                       </span>
                       <span
-                        className={`text-xs font-medium flex items-center gap-1 ${
-                          metrics.conversionRate.trend === "up"
-                            ? "text-green-600"
-                            : "text-red-600"
-                        }`}
+                        className={`text-xs font-medium flex items-center gap-1 ${metrics.conversionRate.trend === "up"
+                          ? "text-green-600"
+                          : "text-red-600"
+                          }`}
                       >
                         {metrics.conversionRate.trend === "up" ? (
                           <TrendingUp className="w-3 h-3" />
